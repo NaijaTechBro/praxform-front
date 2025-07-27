@@ -26,7 +26,7 @@ const Header = () => {
               Features
               <svg className="w-4 h-4 ml-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
             </a>
-            <a href="#pricing" className="text-gray-700 hover:text-[#1475F4] font-medium">Pricing</a>
+            <a href="#faqs" className="text-gray-700 hover:text-[#1475F4] font-medium">FAQs</a>
             <a href="#support" className="text-gray-700 hover:text-[#1475F4] font-medium">Support</a>
             <a href="#contact" className="text-gray-700 hover:text-[#1475F4] font-medium">Contact Us</a>
           </nav>

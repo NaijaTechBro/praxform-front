@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaFileAlt } from 'react-icons/fa'; // Example icon
+import { FaFileAlt } from 'react-icons/fa';
 import { AiOutlineEllipsis } from 'react-icons/ai';
 
 const TemplateCard = ({ title, description, usageCount, onUse }) => {
