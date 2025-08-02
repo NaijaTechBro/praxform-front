@@ -9,6 +9,7 @@ import TimeIcon from '../assets/statscard/average.png';
 import StatsCard from '../components/dashboard/StatsCard';
 import RecentFormsTable from '../components/dashboard/RecentFormsTable';
 import TemplateLibrary from '../components/Dashboard/TemplateLibrary';
+import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
   const createIcon = (src, alt) => <img src={src} alt={alt} className="w-5 h-5" />;
@@ -27,15 +28,31 @@ const Dashboard = () => {
           <h2 className="text-3xl font-bold text-gray-800">Dashboard</h2>
           <p className="text-[#5F80A0]">Overview of sent/received forms, status tracking, analytics</p>
         </div>
-                <button className="hidden sm:flex items-center justify-center bg-[#1475F4] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700">
-          <FiPlus className="mr-2" />
-          Create New Form
-        </button>
-        {/* This button is a mobile-only fallback for the one in the header */}
-        <button className="flex sm:hidden mt-4 w-full justify-center items-center bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700">
+
+
+<div className="flex justify-center space-x-4">
+          {/* Create New Form Button (Desktop) */}
+          {/* Changed button to Link and used 'to' prop for navigation */}
+          <Link
+            to="/create-form" // Or whatever your target route for creating a new form is
+            className="hidden sm:flex items-center justify-center bg-[#1475F4] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors duration-200 focus:outline-none"
+          >
             <FiPlus className="mr-2" />
             Create New Form
-        </button>
+          </Link>
+
+          {/* This button is a mobile-only fallback for the one in the header */}
+          {/* Changed button to Link and used 'to' prop for navigation */}
+          <Link
+            to="/create-form" // Or whatever your target route for creating a new form is
+            className="flex sm:hidden mt-4 w-full justify-center items-center bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors duration-200 focus:outline-none"
+          >
+            <FiPlus className="mr-2" />
+            Create New Form
+          </Link>
+        </div>
+
+        
       </div>
 
       {/* Stats Cards */}

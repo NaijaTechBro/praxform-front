@@ -12,6 +12,7 @@ import UpdatePassword from './pages/Auth/User/UpdatePassword';
 import BookADemo from './components/Home/BookADemo';
 import Dashboard from './pages/Dashboard';
 import Layout from './components/Layout/Layout';
+import NewFormPage from './pages/Business/NewFormPage';
 
 
 const App = () => {
@@ -32,6 +33,7 @@ const App = () => {
              {/* --- Protected Routes (These will have the Sidebar and Header) --- */}
         <Route element={<Layout />}>
           <Route path='/dashboard' element={<Dashboard />} />
+          <Route path='/create-form' element={<NewFormPage />} />
           {/* Add other protected routes here that need the layout */}
           {/* E.g., <Route path='/forms' element={<FormsPage />} /> */}
           {/* E.g., <Route path='/settings' element={<SettingsPage />} /> */}
