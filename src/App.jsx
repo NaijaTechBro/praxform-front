@@ -17,10 +17,15 @@ import Ach from './pages/Templates/ach/Ach';
 import W9 from './pages/Templates/w9/W9';
 import CreditCard from './pages/Templates/credit_card/Credit_Card';
 import Templates from './pages/Templates/Templates';
+import Forms from './pages/Form/Forms';
+import Auditlogs from './pages/Audit/AuditLogs';
+
+import { AuthProvider } from './context/AuthContext'; 
 
 
 const App = () => {
   return (
+    <AuthProvider>
         <Router>
           <Routes>
             {/* Authentication Routes */}
@@ -43,12 +48,14 @@ const App = () => {
           <Route path='/templates/w9' element={<W9 />} />
           <Route path='/templates/credit-card' element={<CreditCard />} />
           {/* Add other protected routes here that need the layout */}
-          {/* E.g., <Route path='/forms' element={<FormsPage />} /> */}
+          <Route path='/forms' element={<Forms />} />
+          <Route path='/audit-logs' element={<Auditlogs />} />
           {/* E.g., <Route path='/settings' element={<SettingsPage />} /> */}
         </Route>
 
           </Routes>
               </Router>
+              </AuthProvider>
   );
 };
 
