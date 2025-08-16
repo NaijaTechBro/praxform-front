@@ -1,19 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ShieldCheck, Send, AlertTriangle } from 'lucide-react';
-import { useAuth } from '../../../context/AuthContext';
-import InputField from '../../../components/Auth/InputField';
+import React, { useState, useRef, useEffect } from 'react';
+import { Send, AlertTriangle } from 'lucide-react';
+import mail from '../../../assets/mailcode.png';
 import Header from '../../../components/Auth/Header';
-import yellow from '../../../assets/yellow-padlock.png';
+import InputField from '../../../components/Auth/InputField';
+import { useAuth } from '../../../context/AuthContext';
 
-
-const ForgotPassword = () => { 
+const ResendVerification = ({ setPage }) => {
     const [email, setEmail] = useState('');
-    const [isSubmitted, setIsSubmitted] = useState(false);
     const [formError, setFormError] = useState('');
+    const [isSubmitted, setIsSubmitted] = useState(false);
 
-    const { forgotPassword, loading, error, clearError } = useAuth();
-    const navigate = useNavigate(); 
+    const { resendVerification, loading, error, clearError } = useAuth();
 
     useEffect(() => {
         if (error) {
@@ -33,36 +30,34 @@ const ForgotPassword = () => {
         }
 
         try {
-            const result = await forgotPassword(email);
+            const result = await resendVerification(email);
             if (result.success) {
                 setIsSubmitted(true);
             } else {
                 setFormError(result.message);
             }
         } catch (err) {
-            setFormError('Failed to send reset link. Please try again.');
+            setFormError('Failed to resend verification link. Please try again.');
         }
     };
-    
+
     return (
         <>
-            {/* Pass navigate function to Header or remove the prop if not needed */}
-            <Header page="forgotPassword" setPage={(pageName) => navigate(`/${pageName}`)} /> 
+            <Header page="resendVerification" setPage={setPage} />
             <div className="flex items-center justify-center min-h-screen bg-gray-100">
-                <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-2xl shadow-xl sm:p-12 my-16">
-                    
+                <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-2xl shadow-xl sm:p-12">
                     <div className="text-center">
-                        <img src={yellow} alt="Lock Icon" className='mx-auto w-24' />
-                        <h1 className="text-3xl font-bold text-gray-900 mt-4">Forgot Password?</h1>
-                        <p className="mt-2 text-sm text-gray-600">
-                            No problem! Enter your email and we'll send you a reset link.
+                        <img src={mail} alt="Mail Icon" className='mx-auto w-24' />
+                        <h1 className="text-3xl font-bold text-gray-800 mt-4">Resend Verification</h1>
+                        <p className="text-gray-500 mt-2">
+                            Enter the email you used to register and we'll send a new verification link.
                         </p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {isSubmitted ? (
                             <div className="p-4 bg-green-100 text-green-700 rounded-lg text-center font-medium">
-                                A password reset link has been sent to your email.
+                                A new verification link has been sent to your email.
                             </div>
                         ) : (
                             <>
@@ -80,18 +75,18 @@ const ForgotPassword = () => {
                                         {formError}
                                     </div>
                                 )}
-                                <button 
+                                <button
                                     type="submit"
                                     className="w-full py-3 font-semibold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 transition disabled:bg-blue-400"
                                     disabled={loading}
                                 >
-                                    {loading ? 'Sending...' : 'Send Reset Link'}
+                                    {loading ? 'Sending...' : 'Resend Verification Link'}
                                 </button>
                             </>
                         )}
-                        <button 
+                        <button
                             type="button"
-                            onClick={() => navigate('/signin')} // Use navigate instead of setPage
+                            onClick={() => setPage('signIn')}
                             className="w-full py-3 font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 transition rounded-lg"
                         >
                             Return to Sign In
@@ -103,4 +98,4 @@ const ForgotPassword = () => {
     );
 };
 
-export default ForgotPassword;
+export default ResendVerification;

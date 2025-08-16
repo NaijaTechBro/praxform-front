@@ -1,5 +1,3 @@
-// src/pages/AuthFlow.jsx
-
 import React, { useState } from 'react';
 import CreateAccount from '../User/CreateAccount';
 import BusinessSetup from '../User/BusinessSetup';
