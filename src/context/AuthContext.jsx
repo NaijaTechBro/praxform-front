@@ -146,7 +146,7 @@ export const AuthProvider = ({ children }) => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/resendverification`, {
+            const response = await fetch(`${API_BASE_URL}/auth/resend-verification`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email }),
@@ -200,7 +200,7 @@ export const AuthProvider = ({ children }) => {
         setError(null);
         try {
             // Backend expects the email in the request body
-            const response = await fetch(`${API_BASE_URL}/auth/forgotpassword`, {
+            const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email }),
@@ -223,12 +223,12 @@ export const AuthProvider = ({ children }) => {
     };
 
     // Reset Password
-    const resetPassword = async (tokenParam, newPassword) => {
+    const resetPassword = async (token, newPassword) => {
         setLoading(true);
         setError(null);
         try {
             // Backend expects the reset token as a URL parameter and new password in body
-            const response = await fetch(`${API_BASE_URL}/auth/resetpassword/${tokenParam}`, {
+            const response = await fetch(`${API_BASE_URL}/auth/reset-password/${token}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ password: newPassword }),
@@ -260,7 +260,7 @@ export const AuthProvider = ({ children }) => {
                 return { success: false, message: 'Authentication token is missing.' };
             }
 
-            const response = await fetch(`${API_BASE_URL}/auth/changepassword`, {
+            const response = await fetch(`${API_BASE_URL}/auth/change-password`, {
                 method: 'PUT',
                 headers: { 
                     'Content-Type': 'application/json',
