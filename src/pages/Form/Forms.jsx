@@ -1,11 +1,9 @@
-// src/pages/Forms.jsx
 import React, { useState, useEffect } from 'react';
-import { useForms } from '../../context/FormContext'; // Use the new hook
-import { FiEye, FiSearch, FiMoreHorizontal } from 'react-icons/fi'; // Import FiEye, FiSearch, FiMoreHorizontal directly
+import { useForms } from '../../context/FormContext';
+import { FiEye, FiSearch, FiMoreHorizontal } from 'react-icons/fi';
 import { FaFileAlt, FaFileContract, FaFileSignature } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 
-// Corrected: Store rendered component instances, not just the component functions
 const iconEye = <FiEye size={20} />;
 const iconEllipsis = <FiMoreHorizontal size={20} />;
 const iconSearch = <FiSearch size={20} />;
@@ -28,8 +26,8 @@ const getStatusClass = (status) => {
 };
 
 const Forms = () => {
-  const { forms, getForms, loading: formsLoading, error: formsError, getFormById, deleteForm } = useForms(); // Renamed loading and error
-  const navigate = useNavigate(); // Initialize navigate hook
+  const { forms, getForms, loading: formsLoading, error: formsError, getFormById, deleteForm, setMessage } = useForms();
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const itemsPerPage = 5;
@@ -39,19 +37,17 @@ const Forms = () => {
   }, []);
 
   useEffect(() => {
-    if (formsError) { // Use formsError specifically for forms content
-      alert(`Error fetching forms: ${formsError}`);
-      // clearError(); // Assuming clearError is not needed here as it's a persistent error display
+    if (formsError) {
+      setMessage({ type: 'error', text: `Error fetching forms: ${formsError}` });
     }
-  }, [formsError]); // Depend on formsError
+  }, [formsError, setMessage]);
 
-  // Defensive check: Ensure forms is an array before calling .filter()
   const filteredForms = Array.isArray(forms) ? forms.filter(form =>
     form.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     form.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     form.createdBy?.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     form.createdBy?.lastName?.toLowerCase().includes(searchTerm.toLowerCase())
-  ) : []; // If not an array, default to an empty array
+  ) : [];
 
   const totalItems = filteredForms.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -67,26 +63,23 @@ const Forms = () => {
     }
   };
 
-  const handleEditForm = (formId) => {
-    getFormById(formId); // Set the current form in context
-    navigate('/create-form'); // Navigate to the form builder page
+  const handleEditForm = async (formId) => {
+    await getFormById(formId); 
+    navigate(`/edit-form/${formId}`); // Changed navigation to the new edit page
   };
 
   const handleDeleteForm = async (formId) => {
     if (window.confirm('Are you sure you want to delete this form?')) {
       try {
         await deleteForm(formId);
-        alert('Form deleted successfully!');
+        // Message is now handled by the context
       } catch (err) {
         console.error('Failed to delete form:', err);
       }
     }
   };
 
-  // Removed the explicit `if (formsLoading)` block.
-  // The components will now render immediately with their default/initial states.
-
-  if (formsError) { // Keep error display as it's critical
+  if (formsError) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <p className="text-lg text-red-700">Error loading forms: {formsError}</p>
@@ -154,21 +147,19 @@ const Forms = () => {
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">{new Date(form.updatedAt).toLocaleDateString()}</td>
                     <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center space-x-2">
-                        {/* View/Edit Form Button */}
                         <button
-                          onClick={() => handleEditForm(form._id)} // Load form into currentForm for editing
+                          onClick={() => handleEditForm(form._id)}
                           className="text-gray-500 hover:text-gray-900 transition-colors"
                           title="View/Edit Form"
                         >
                           {iconEye}
                         </button>
-                        {/* Delete Form Button */}
                         <button
                           onClick={() => handleDeleteForm(form._id)}
                           className="text-red-500 hover:text-red-700 transition-colors"
                           title="Delete Form"
                         >
-                          {iconEllipsis} {/* Using iconEllipsis here */}
+                          {iconEllipsis}
                         </button>
                       </div>
                     </td>
@@ -176,7 +167,9 @@ const Forms = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className="px-4 py-4 text-center text-gray-500">No forms found.</td>
+                  <td colSpan="6" className="px-4 py-4 text-center text-gray-500">
+                    {formsLoading ? "Loading forms..." : "No forms found."}
+                  </td>
                 </tr>
               )}
             </tbody>

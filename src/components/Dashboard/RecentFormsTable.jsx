@@ -25,7 +25,8 @@ const getStatusClass = (status) => {
 };
 
 const RecentFormsTable = ({ limit = 5 }) => {
-  const { forms, getForms, loading, error, clearError, getFormById, deleteForm } = useForms();
+  // Removed loading from destructuring, as requested
+  const { forms, getForms, error, clearError, getFormById, deleteForm, setMessage } = useForms();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,29 +42,29 @@ const RecentFormsTable = ({ limit = 5 }) => {
 
   const recentForms = Array.isArray(forms)
     ? forms
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Sort by most recent
-        .slice(0, limit) // Limit the number of forms
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, limit)
     : [];
 
-  const handleEditForm = (formId) => {
-    getFormById(formId); // Set the current form in context
-    navigate('/create-form'); // Navigate to the form builder page
+  const handleEditForm = async (formId) => {
+    await getFormById(formId); 
+    navigate(`/edit-form/${formId}`);
   };
 
   const handleDeleteForm = async (formId) => {
     if (window.confirm('Are you sure you want to delete this form?')) {
       try {
         await deleteForm(formId);
-        alert('Form deleted successfully!');
+        setMessage({ type: 'success', text: 'Form deleted successfully!' });
       } catch (err) {
         console.error('Failed to delete form:', err);
+        setMessage({ type: 'error', text: 'Failed to delete form.' });
       }
     }
   };
 
-  if (loading) {
-    return <p className="text-center text-gray-500">Loading recent forms...</p>;
-  }
+  // Removed the explicit loading block, as requested.
+  // The UI will render immediately with the initial state of 'forms' (an empty array).
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
@@ -109,7 +110,6 @@ const RecentFormsTable = ({ limit = 5 }) => {
                     </span>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
-                    
                     <div className="text-sm font-medium text-gray-900">{form.createdBy?.firstName || 'N/A'} {form.createdBy?.lastName || ''}</div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(form.createdAt).toLocaleDateString()}</td>
@@ -135,7 +135,9 @@ const RecentFormsTable = ({ limit = 5 }) => {
               ))
             ) : (
               <tr>
-                <td colSpan="5" className="px-4 py-4 text-center text-gray-500">No recent forms found.</td>
+                <td colSpan="5" className="px-4 py-4 text-center text-gray-500">
+                  {"No recent forms found."}
+                </td>
               </tr>
             )}
           </tbody>

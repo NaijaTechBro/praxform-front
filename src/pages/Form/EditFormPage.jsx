@@ -1,35 +1,47 @@
 import React, { useState, useEffect } from 'react';
 import { useForms } from '../../context/FormContext';
-import { FiSave, FiEye, FiSend, FiPlus, FiTrash2, FiSettings } from 'react-icons/fi';
-import ElementPropertiesSidebar from '../../components/NewForm/ElementPropertiesSidebar';
+import { FiPlus, FiChevronLeft, FiChevronRight, FiEdit2, FiEye, FiSave, FiSend, FiSettings, FiTrash2 } from 'react-icons/fi';
 import FormFieldsSidebar from '../../components/NewForm/FormFieldsSidebar';
+import ElementPropertiesSidebar from '../../components/NewForm/ElementPropertiesSidebar';
 import FormPreviewModal from '../../components/NewForm/FormPreviewModal';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
-const BlankFormPage = () => {
-  const { createForm, updateForm, currentForm, loading: formsLoading, error, clearError, sendForm, setMessage } = useForms();
+const EditFormPage = () => {
+  const { updateForm, currentForm, loading: formsLoading, error, clearError, sendForm, setMessage, getFormById } = useForms();
   const navigate = useNavigate();
+  const { id } = useParams();
 
-  const [formName, setFormName] = useState('New Blank Form');
+  const [formName, setFormName] = useState('Loading...');
   const [formDescription, setFormDescription] = useState('');
   const [formFields, setFormFields] = useState([]);
   const [selectedElement, setSelectedElement] = useState(null);
+  const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(true);
+  const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(true);
+  const [isHeaderExpanded, setIsHeaderExpanded] = useState(true);
   const [formStatus, setFormStatus] = useState('draft');
   const [formId, setFormId] = useState(null);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
-  const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(true);
-  const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(true);
   const [isSaving, setIsSaving] = useState(false); // New state for saving
   const [isSending, setIsSending] = useState(false); // New state for sending
 
+  useEffect(() => {
+    if (id) {
+      getFormById(id);
+    }
+  }, [id, getFormById]);
 
   useEffect(() => {
     if (currentForm) {
-      // If a currentForm is unexpectedly here, we'll log it and proceed as a new blank form.
-      // The logic for editing is now in EditFormPage.jsx.
-      console.warn('Navigated to blank form page with a current form. Creating a new blank form instead.');
+      setFormId(currentForm._id);
+      setFormName(currentForm.name);
+      setFormDescription(currentForm.description || '');
+      setFormFields(currentForm.fields || []);
+      setFormStatus(currentForm.status);
+    } else if (!formsLoading && !currentForm && id) {
+      setMessage({ type: 'error', text: 'No form found with that ID.' });
+      navigate('/forms');
     }
-  }, [currentForm]);
+  }, [currentForm, navigate, setMessage, formsLoading, id]);
 
   useEffect(() => {
     if (error) {
@@ -37,6 +49,7 @@ const BlankFormPage = () => {
       clearError();
     }
   }, [error, clearError, setMessage]);
+
 
   const handleDrop = (e) => {
     e.preventDefault();
@@ -72,6 +85,10 @@ const BlankFormPage = () => {
   };
 
   const handleSaveDraft = async () => {
+    if (!formId) {
+      setMessage({ type: 'error', text: 'Cannot save, no form ID exists.' });
+      return;
+    }
     const formData = {
       name: formName,
       description: formDescription,
@@ -80,15 +97,9 @@ const BlankFormPage = () => {
     };
     setIsSaving(true);
     try {
-      if (formId) {
-        await updateForm(formId, formData);
-      } else {
-        const savedForm = await createForm(formData);
-        setFormId(savedForm._id);
-        setFormStatus(savedForm.status);
-      }
+      await updateForm(formId, formData);
     } catch (err) {
-      console.error('Failed to save blank form:', err);
+      console.error('Failed to save form:', err);
     } finally {
       setIsSaving(false);
     }
@@ -99,17 +110,16 @@ const BlankFormPage = () => {
       setMessage({ type: 'error', text: "Please save the form as a draft first before sending." });
       return;
     }
-    const recipients = [{ email: 'blankform_test@example.com', name: 'Blank Form Recipient' }];
-    const message = 'Please fill out this custom form.';
+    const recipients = [{ email: 'test@example.com', name: 'Test User' }];
+    const message = 'Please fill out this form.';
     const expiresIn = 7;
 
     setIsSending(true);
     try {
       await sendForm(formId, { recipients, message, expiresIn });
       setFormStatus('active');
-      navigate('/forms');
     } catch (err) {
-      console.error('Failed to send blank form:', err);
+      console.error('Failed to send form:', err);
     } finally {
       setIsSending(false);
     }
@@ -196,11 +206,7 @@ const BlankFormPage = () => {
 
         {/* Form Design Area */}
         <div className="flex-1 bg-white rounded-lg shadow-md p-8 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-          {formFields.length === 0 ? (
-            <div className="text-center p-10 border border-dashed border-gray-300 rounded-lg max-w-lg mx-auto">
-              <p className="text-gray-500 mb-6 text-base">Drag and drop form elements from the left sidebar to start building your custom form.</p>
-            </div>
-          ) : (
+          {formFields.length > 0 ? (
             formFields.map((field) => (
               <div
                 key={field.id}
@@ -229,11 +235,15 @@ const BlankFormPage = () => {
                 </button>
               </div>
             ))
+          ) : (
+            <div className="text-center p-10 border border-dashed border-gray-300 rounded-lg max-w-lg mx-auto">
+              <p className="text-gray-500 mb-6 text-base">Drag and drop form elements from the left sidebar to start building your custom form.</p>
+            </div>
           )}
         </div>
       </div>
 
-      {/* Right Sidebar for Element Properties (Toggable) */}
+      {/* Right Sidebar for Element Properties */}
       <div
         className={`fixed inset-y-0 right-0 z-40 w-80 bg-white border-l border-gray-200 transition-transform duration-300 ease-in-out transform ${
           isRightSidebarOpen ? 'translate-x-0' : 'translate-x-full'
@@ -263,4 +273,4 @@ const BlankFormPage = () => {
   );
 };
 
-export default BlankFormPage;
+export default EditFormPage;

@@ -1,9 +1,9 @@
 // src/components/NewForm/FormBuilderArea.jsx
 import React from 'react';
-import { FiPlus, FiTrash2 } from 'react-icons/fi'; // Added FiTrash2 for delete icon
-import create from '../../assets/statscard/create.png'; // Make sure this path is correct
+import { FiPlus, FiTrash2 } from 'react-icons/fi';
+import create from '../../assets/statscard/create.png'; 
 
-const FormBuilderArea = ({ formFields, setSelectedElement, selectedElement, onDeleteField, onStartFromScratch }) => { // Added onStartFromScratch prop
+const FormBuilderArea = ({ formFields, setSelectedElement,onUseTemplate, selectedElement, onDeleteField, onStartFromScratch }) => { // Added onStartFromScratch prop
   if (formFields.length === 0) {
     return (
       <div className="min-h-[calc(100vh-170px)] bg-white rounded-lg shadow-md flex items-center justify-center p-8">
@@ -13,12 +13,15 @@ const FormBuilderArea = ({ formFields, setSelectedElement, selectedElement, onDe
           <p className="text-gray-500 mb-6 text-base">Drag and drop form elements from the left sidebar or start with a template</p>
           <div className="flex justify-center space-x-4">
             <button
-              onClick={onStartFromScratch} // Call the new handler
+              onClick={onStartFromScratch}
               className="flex items-center bg-transparent border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors duration-200 focus:outline-none"
             >
               <FiPlus className="text-xl mr-2 -ml-1" /> Start From Scratch
             </button>
-            <button className="bg-[#1475F4] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors duration-200 focus:outline-none">
+            <button 
+            onClick={onUseTemplate}
+              
+            className="bg-[#1475F4] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors duration-200 focus:outline-none">
               Use Template
             </button>
           </div>

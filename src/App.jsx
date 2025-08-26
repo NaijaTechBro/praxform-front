@@ -1,4 +1,3 @@
-// src/App.jsx
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
@@ -18,6 +17,7 @@ import Dashboard from './pages/Dashboard';
 import Layout from './components/Layout/Layout';
 import NewFormPage from './pages/Form/NewFormPage';
 import BlankFormPage from './pages/Form/BlankFormPage';
+import EditFormPage from './pages/Form/EditFormPage';
 import Ach from './pages/Templates/ach/Ach';
 import W9 from './pages/Templates/w9/W9';
 import CreditCard from './pages/Templates/credit_card/Credit_Card';
@@ -25,14 +25,12 @@ import Templates from './pages/Templates/Templates';
 import Forms from './pages/Form/Forms';
 import Auditlogs from './pages/Audit/AuditLogs';
 import ChangePassword from './pages/Auth/User/ChangePassword';
+import Submissions from './pages/Submission/Submission';
 
 // Context Providers
 import { AuthProvider } from './context/AuthContext'; 
 import { FormProvider } from './context/FormContext';
-
-// New ProtectedRoute component
-import ProtectedRoute from './components/Auth/ProtectedRoute';
-
+import ProtectedRoute from './components/auth/ProtectedRoute';
 
 const App = () => {
   return (
@@ -52,9 +50,8 @@ const App = () => {
             <Route path="/demo" element={<BookADemo />} />
 
             {/* --- Protected Routes (Require authentication) --- */}
-            {/* The Layout component contains the Header and Sidebar, which are part of the protected UI */}
-            <Route element={<ProtectedRoute />}> {/* This is the main protected route wrapper */}
-              <Route element={<Layout />}> 
+            <Route element={<ProtectedRoute />}>
+              <Route element={<Layout />}>
                 <Route path='/dashboard' element={<Dashboard />} />
                 <Route path='/create-form' element={<NewFormPage />} />
                 <Route path='/templates' element={<Templates />} />
@@ -63,14 +60,13 @@ const App = () => {
                 <Route path='/templates/credit-card' element={<CreditCard />} />
                 <Route path='/forms' element={<Forms />} />
                 <Route path='/audit-logs' element={<Auditlogs />} />
-                <Route path='/change-password' element={<ChangePassword />} /> 
+                <Route path='/change-password' element={<ChangePassword />} />
+                <Route path='/submissions' element={<Submissions />} />
               </Route>
+              {/* Full-screen protected routes */}
               <Route path='/blank-form' element={<BlankFormPage />} />
-              {/* E.g., <Route path='/settings' element={<SettingsPage />} /> if it doesn't use Layout */}
+              <Route path='/edit-form/:id' element={<EditFormPage />} /> {/* New edit form route */}
             </Route>
-
-            {/* --- Catch-all for unknown routes (optional) --- */}
-            {/* <Route path="*" element={<NotFoundPage />} /> */}
           </Routes>
         </Router>
       </FormProvider>
