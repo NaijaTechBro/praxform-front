@@ -15,16 +15,16 @@ import BookADemo from './components/Home/BookADemo';
 
 // Protected components that use the Layout
 import Dashboard from './pages/Dashboard';
-import Layout from './components/Layout/Layout'; // This already contains Header and Sidebar
+import Layout from './components/Layout/Layout';
 import NewFormPage from './pages/Form/NewFormPage';
-import BlankFormPage from './pages/Form/BlankFormPage'; // Blank form page should also be protected
+import BlankFormPage from './pages/Form/BlankFormPage';
 import Ach from './pages/Templates/ach/Ach';
 import W9 from './pages/Templates/w9/W9';
 import CreditCard from './pages/Templates/credit_card/Credit_Card';
 import Templates from './pages/Templates/Templates';
 import Forms from './pages/Form/Forms';
 import Auditlogs from './pages/Audit/AuditLogs';
-import ChangePassword from './pages/Auth/User/ChangePassword'; // Assuming this is a protected route
+import ChangePassword from './pages/Auth/User/ChangePassword';
 
 // Context Providers
 import { AuthProvider } from './context/AuthContext'; 
@@ -54,7 +54,7 @@ const App = () => {
             {/* --- Protected Routes (Require authentication) --- */}
             {/* The Layout component contains the Header and Sidebar, which are part of the protected UI */}
             <Route element={<ProtectedRoute />}> {/* This is the main protected route wrapper */}
-              <Route element={<Layout />}> {/* Routes within Layout will have Header and Sidebar */}
+              <Route element={<Layout />}> 
                 <Route path='/dashboard' element={<Dashboard />} />
                 <Route path='/create-form' element={<NewFormPage />} />
                 <Route path='/templates' element={<Templates />} />
@@ -63,10 +63,8 @@ const App = () => {
                 <Route path='/templates/credit-card' element={<CreditCard />} />
                 <Route path='/forms' element={<Forms />} />
                 <Route path='/audit-logs' element={<Auditlogs />} />
-                <Route path='/change-password' element={<ChangePassword />} /> {/* Assuming this is a protected route */}
-                {/* Add any other protected routes that should use the Layout here */}
+                <Route path='/change-password' element={<ChangePassword />} /> 
               </Route>
-              {/* Routes that are protected but DO NOT use the main Layout (e.g., a full-screen builder) */}
               <Route path='/blank-form' element={<BlankFormPage />} />
               {/* E.g., <Route path='/settings' element={<SettingsPage />} /> if it doesn't use Layout */}
             </Route>
