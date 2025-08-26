@@ -1,11 +1,8 @@
-
-
 // src/components/newForm/FormFieldsSidebar.jsx
 import React from 'react';
-import { FaTextHeight, FaRegDotCircle, FaCalendarAlt, FaSearch, FaFileUpload, FaIdCard, FaSignature } from 'react-icons/fa';
-import { IoMdKey } from 'react-icons/io'; 
-import { MdEmail } from 'react-icons/md'; 
-import { BsFillCalendarFill } from 'react-icons/bs';
+import { FaTextHeight, FaCalendarAlt, FaSearch, FaFileUpload, FaIdCard, FaSignature } from 'react-icons/fa';
+import { IoMdKey } from 'react-icons/io';
+import { MdEmail } from 'react-icons/md';
 
 const FormFieldsSidebar = () => {
   const handleDragStart = (e, fieldType) => {
@@ -14,9 +11,9 @@ const FormFieldsSidebar = () => {
 
   const basicFields = [
     { name: 'Text Field', icon: <FaTextHeight size={16} className="text-gray-500" />, type: 'text' },
-    { name: 'Number', icon: <IoMdKey size={16} className="text-gray-500" />, type: 'number' }, // Changed icon to IoMdKey for "0"
-    { name: 'Date Picker', icon: <BsFillCalendarFill size={16} className="text-gray-500" />, type: 'date' }, // Changed icon to BsFillCalendarFill
-    { name: 'Email Field', icon: <MdEmail size={16} className="text-gray-500" />, type: 'email' }, // Changed icon to MdEmail
+    { name: 'Number', icon: <IoMdKey size={16} className="text-gray-500" />, type: 'number' },
+    { name: 'Date Picker', icon: <FaCalendarAlt size={16} className="text-gray-500" />, type: 'date' },
+    { name: 'Email Field', icon: <MdEmail size={16} className="text-gray-500" />, type: 'email' },
     { name: 'File Upload', icon: <FaFileUpload size={16} className="text-gray-500" />, type: 'file' },
   ];
 
@@ -31,15 +28,15 @@ const FormFieldsSidebar = () => {
       draggable
       onDragStart={(e) => handleDragStart(e, type)}
     >
-      <div className="flex items-center justify-center w-6 h-6 mr-2"> {/* Added wrapper for consistent icon spacing/sizing */}
+      <div className="flex items-center justify-center w-6 h-6 mr-2">
         {icon}
       </div>
-      <span className="ml-0">{name}</span> {/* Removed ml-2 as wrapper adds space */}
+      <span className="ml-0">{name}</span>
     </div>
   );
 
   return (
-    <div className="w-full h-full p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"> {/* Custom scrollbar */}
+    <div className="w-full h-full p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
       <div className="mb-4">
         <div className="relative">
           <FaSearch size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />

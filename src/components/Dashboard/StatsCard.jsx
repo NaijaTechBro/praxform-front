@@ -2,9 +2,29 @@
 import React from 'react';
 import { FiArrowUp, FiArrowDown } from 'react-icons/fi';
 
-const StatsCard = ({ icon, title, value, change, trend }) => {
+const StatsCard = ({ icon, title, value, previousValue }) => {
+  // Ensure value and previousValue are numbers for calculation
+  const currentValue = typeof value === 'number' ? value : 0;
+  const prevValue = typeof previousValue === 'number' ? previousValue : 0;
+
+  let change = 0;
+  let trend = 'neutral'; // 'up', 'down', 'neutral'
+
+  if (prevValue !== 0) {
+    change = ((currentValue - prevValue) / prevValue) * 100;
+    if (change > 0) {
+      trend = 'up';
+    } else if (change < 0) {
+      trend = 'down';
+    }
+  } else if (currentValue > 0) {
+    // If previous value was 0 and current is > 0, it's an "up" trend
+    trend = 'up';
+    change = 100; // Represent as 100% increase from zero
+  }
+
   const isUp = trend === 'up';
-  const trendColor = isUp ? 'text-green-500' : 'text-red-500';
+  const trendColor = trend === 'up' ? 'text-green-500' : trend === 'down' ? 'text-red-500' : 'text-gray-500';
   const TrendIcon = isUp ? FiArrowUp : FiArrowDown;
 
   return (
@@ -14,12 +34,14 @@ const StatsCard = ({ icon, title, value, change, trend }) => {
         <div className="text-2xl text-gray-400">{icon}</div>
       </div>
       <div>
-        <h3 className="text-3xl font-bold text-gray-900">{value}</h3>
+        <h3 className="text-3xl font-bold text-gray-900">{currentValue}</h3>
         <div className="flex items-center text-sm mt-1">
-          <span className={`flex items-center font-semibold ${trendColor}`}>
-            <TrendIcon className="mr-1" />
-            {change}
-          </span>
+          {trend !== 'neutral' && (
+            <span className={`flex items-center font-semibold ${trendColor}`}>
+              <TrendIcon className="mr-1" />
+              {change.toFixed(2)}%
+            </span>
+          )}
           <span className="text-gray-500 ml-1">Today</span>
         </div>
       </div>

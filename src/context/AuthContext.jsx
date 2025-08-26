@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 
+import axios from 'axios';
 // Create the Auth Context
 const AuthContext = createContext();
 
@@ -11,49 +12,51 @@ export const useAuth = () => {
 // Auth Provider Component
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const [token, setToken] = useState(localStorage.getItem('userToken') || null);
-    const [loading, setLoading] = useState(true);
+    const [token, setToken] = useState(localStorage.getItem('userToken'));
+    const [loading, setLoading] = useState(true); // Start loading, as we might fetch user data
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState('signIn');
 
     const API_BASE_URL = import.meta.env.VITE_API_URL;
 
-    // Initialize user and token from localStorage on mount
+    // Fetch user data on component mount if a token exists
     useEffect(() => {
-        const storedToken = localStorage.getItem('userToken');
-        if (storedToken) {
-            setToken(storedToken);
-            fetchMe(storedToken);
-        }
-        setLoading(false);
-    }, []);
+        const initializeAuth = async () => {
+            if (token) {
+                await fetchMe(token);
+            } else {
+                setLoading(false); // No token, so not loading user data
+            }
+        };
+        initializeAuth();
+    }, []); // Empty dependency array means this runs once on mount
 
     // Function to fetch current user details
     const fetchMe = async (authToken) => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/me`, {
-                method: 'GET',
+            const response = await axios.get(`${API_BASE_URL}/auth/me`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${authToken}`,
                 },
             });
 
-            const data = await response.json();
+            const data = response.data;
 
-            if (response.ok) {
-                setUser(data);
-            } else {
-                setError(data.message || 'Failed to fetch user data.');
-                setUser(null);
-                setToken(null);
-                localStorage.removeItem('userToken');
-            }
+            // Ensure currentOrganization is set from the backend response
+            setUser({
+                _id: data._id,
+                firstName: data.firstName,
+                lastName: data.lastName,
+                email: data.email,
+                currentOrganization: data.currentOrganization,
+            });
+            setToken(authToken); // Keep the token if fetchMe was successful
         } catch (err) {
             console.error('Fetch me error:', err);
-            setError('Network error or server unavailable.');
+            setError(err.response?.data?.message || 'Network error or server unavailable.');
             setUser(null);
             setToken(null);
             localStorage.removeItem('userToken');
@@ -68,27 +71,22 @@ export const AuthProvider = ({ children }) => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/register`, {
-                method: 'POST',
+            const response = await axios.post(`${API_BASE_URL}/auth/register`, userData, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(userData),
             });
 
-            if (response.ok) {
-                const data = await response.json();
-                return { success: true, message: data.message };
+            if (response.status === 201) {
+                return { success: true, message: response.data.message };
             } else {
-                // Attempt to parse error message if available, otherwise use a generic message
-                const errorData = await response.json().catch(() => ({ message: 'Server error or invalid response.' }));
-                setError(errorData.message || 'Registration failed.');
-                return { success: false, message: errorData.message || 'Registration failed.' };
+                setError(response.data.message || 'Registration failed.');
+                return { success: false, message: response.data.message || 'Registration failed.' };
             }
         } catch (err) {
             console.error('Registration error:', err);
-            setError('Network error or server unavailable.');
-            return { success: false, message: 'Network error or server unavailable.' };
+            setError(err.response?.data?.message || 'Network error or server unavailable.');
+            return { success: false, message: err.response?.data?.message || 'Network error or server unavailable.' };
         } finally {
             setLoading(false);
         }
@@ -99,35 +97,32 @@ export const AuthProvider = ({ children }) => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/login`, {
-                method: 'POST',
+            const response = await axios.post(`${API_BASE_URL}/auth/login`, credentials, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(credentials),
             });
 
-            if (response.ok) {
-                const data = await response.json();
-                // returns user data and a token on successful login
+            if (response.status === 200) {
+                const data = response.data;
                 setUser({
                     _id: data._id,
                     firstName: data.firstName,
                     lastName: data.lastName,
                     email: data.email,
+                    currentOrganization: data.currentOrganization,
                 });
                 setToken(data.token);
                 localStorage.setItem('userToken', data.token);
                 return { success: true };
             } else {
-                const errorData = await response.json().catch(() => ({ message: 'Server error or invalid response.' }));
-                setError(errorData.message || 'Login failed. Invalid credentials.');
-                return { success: false, message: errorData.message || 'Login failed.' };
+                setError(response.data.message || 'Login failed. Invalid credentials.');
+                return { success: false, message: response.data.message || 'Login failed.' };
             }
         } catch (err) {
             console.error('Login error:', err);
-            setError('Network error or server unavailable.');
-            return { success: false, message: 'Network error or server unavailable.' };
+            setError(err.response?.data?.message || 'Network error or server unavailable.');
+            return { success: false, message: err.response?.data?.message || 'Network error or server unavailable.' };
         } finally {
             setLoading(false);
         }
@@ -138,7 +133,7 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
         setToken(null);
         localStorage.removeItem('userToken');
-        setCurrentPage('signIn');
+        window.location.href = '/signin'; // Redirect to the sign-in page after logout
     };
 
     // Resend Verification Email
@@ -146,23 +141,19 @@ export const AuthProvider = ({ children }) => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/resend-verification`, {
-                method: 'POST',
+            const response = await axios.post(`${API_BASE_URL}/auth/resend-verification`, { email }, {
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email }),
             });
-            if (response.ok) {
-                const data = await response.json();
-                return { success: true, message: data.message };
+            if (response.status === 200) {
+                return { success: true, message: response.data.message };
             } else {
-                const errorData = await response.json().catch(() => ({ message: 'Server error or invalid response.' }));
-                setError(errorData.message || 'Failed to resend verification email.');
-                return { success: false, message: errorData.message || 'Failed to resend verification email.' };
+                setError(response.data.message || 'Failed to resend verification email.');
+                return { success: false, message: response.data.message || 'Failed to resend verification email.' };
             }
         } catch (err) {
             console.error('Resend verification error:', err);
-            setError('Network error or server unavailable.');
-            return { success: false, message: 'Network error or server unavailable.' };
+            setError(err.response?.data?.message || 'Network error or server unavailable.');
+            return { success: false, message: err.response?.data?.message || 'Network error or server unavailable.' };
         } finally {
             setLoading(false);
         }
@@ -173,22 +164,17 @@ export const AuthProvider = ({ children }) => {
         setLoading(true);
         setError(null);
         try {
-            // Backend expects the 6-digit code as a URL parameter named 'code'
-            const response = await fetch(`${API_BASE_URL}/auth/verifyemail/${tokenParam}`, {
-                method: 'GET',
-            });
-            if (response.ok) {
-                const data = await response.json();
-                return { success: true, message: data.message }; // Returns the success message
+            const response = await axios.get(`${API_BASE_URL}/auth/verifyemail/${tokenParam}`);
+            if (response.status === 200) {
+                return { success: true, message: response.data.message };
             } else {
-                const errorData = await response.json().catch(() => ({ message: 'Server error or invalid response.' }));
-                setError(errorData.message || 'Email verification failed.');
-                return { success: false, message: errorData.message || 'Email verification failed.' };
+                setError(response.data.message || 'Email verification failed.');
+                return { success: false, message: response.data.message || 'Email verification failed.' };
             }
         } catch (err) {
             console.error('Verify email error:', err);
-            setError('Network error or server unavailable.');
-            return { success: false, message: 'Network error or server unavailable.' };
+            setError(err.response?.data?.message || 'Network error or server unavailable.');
+            return { success: false, message: err.response?.data?.message || 'Network error or server unavailable.' };
         } finally {
             setLoading(false);
         }
@@ -199,24 +185,19 @@ export const AuthProvider = ({ children }) => {
         setLoading(true);
         setError(null);
         try {
-            // Backend expects the email in the request body
-            const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
-                method: 'POST',
+            const response = await axios.post(`${API_BASE_URL}/auth/forgot-password`, { email }, {
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email }),
             });
-            if (response.ok) {
-                const data = await response.json();
-                return { success: true, message: data.message };
+            if (response.status === 200) {
+                return { success: true, message: response.data.message };
             } else {
-                const errorData = await response.json().catch(() => ({ message: 'Server error or invalid response.' }));
-                setError(errorData.message || 'Failed to send password reset email.');
-                return { success: false, message: errorData.message || 'Failed to send password reset email.' };
+                setError(response.data.message || 'Failed to send password reset email.');
+                return { success: false, message: response.data.message || 'Failed to send password reset email.' };
             }
         } catch (err) {
             console.error('Forgot password error:', err);
-            setError('Network error or server unavailable.');
-            return { success: false, message: 'Network error or server unavailable.' };
+            setError(err.response?.data?.message || 'Network error or server unavailable.');
+            return { success: false, message: err.response?.data?.message || 'Network error or server unavailable.' };
         } finally {
             setLoading(false);
         }
@@ -227,29 +208,24 @@ export const AuthProvider = ({ children }) => {
         setLoading(true);
         setError(null);
         try {
-            // Backend expects the reset token as a URL parameter and new password in body
-            const response = await fetch(`${API_BASE_URL}/auth/reset-password/${token}`, {
-                method: 'PUT',
+            const response = await axios.put(`${API_BASE_URL}/auth/reset-password/${token}`, { password: newPassword }, {
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password: newPassword }),
             });
-            if (response.ok) {
-                const data = await response.json();
-                return { success: true, message: data.message };
+            if (response.status === 200) {
+                return { success: true, message: response.data.message };
             } else {
-                const errorData = await response.json().catch(() => ({ message: 'Server error or invalid response.' }));
-                setError(errorData.message || 'Failed to reset password.');
-                return { success: false, message: errorData.message || 'Failed to reset password.' };
+                setError(response.data.message || 'Failed to reset password.');
+                return { success: false, message: response.data.message || 'Failed to reset password.' };
             }
         } catch (err) {
             console.error('Reset password error:', err);
-            setError('Network error or server unavailable.');
-            return { success: false, message: 'Network error or server unavailable.' };
+            setError(err.response?.data?.message || 'Network error or server unavailable.');
+            return { success: false, message: err.response?.data?.message || 'Network error or server unavailable.' };
         } finally {
             setLoading(false);
         }
     };
-    
+
     // Change Password (for logged-in users)
     const changePassword = async (oldPassword, newPassword) => {
         setLoading(true);
@@ -260,27 +236,23 @@ export const AuthProvider = ({ children }) => {
                 return { success: false, message: 'Authentication token is missing.' };
             }
 
-            const response = await fetch(`${API_BASE_URL}/auth/change-password`, {
-                method: 'PUT',
-                headers: { 
+            const response = await axios.put(`${API_BASE_URL}/auth/change-password`, { oldPassword, newPassword }, {
+                headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` // Use the stored token
+                    'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ oldPassword, newPassword }),
             });
 
-            const data = await response.json();
-
-            if (response.ok) {
-                return { success: true, message: data.message };
+            if (response.status === 200) {
+                return { success: true, message: response.data.message };
             } else {
-                setError(data.message || 'Failed to change password.');
-                return { success: false, message: data.message || 'Failed to change password.' };
+                setError(response.data.message || 'Failed to change password.');
+                return { success: false, message: response.data.message || 'Failed to change password.' };
             }
         } catch (err) {
             console.error('Change password error:', err);
-            setError('Network error or server unavailable.');
-            return { success: false, message: 'Network error or server unavailable.' };
+            setError(err.response?.data?.message || 'Network error or server unavailable.');
+            return { success: false, message: err.response?.data?.message || 'Network error or server unavailable.' };
         } finally {
             setLoading(false);
         }

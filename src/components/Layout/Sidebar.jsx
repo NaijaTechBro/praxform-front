@@ -1,8 +1,7 @@
-
-
-
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import { Menu, Transition } from '@headlessui/react'; // Import Menu and Transition
+import { Fragment } from 'react'; // Import Fragment for Transition
 
 // Import local image assets
 import logo from '../../assets/logo.png';
@@ -15,6 +14,7 @@ import Integrations from '../../assets/sidebar/integration.png';
 import Compliance from '../../assets/sidebar/compliance.png';
 import Settings from '../../assets/sidebar/setting.png';
 import AuditLogs from '../../assets/sidebar/audit.png';
+import { useAuth } from '../../context/AuthContext'; // Import useAuth hook
 
 // Inline SVG icons for collapse button and more options
 const menuIcons = {
@@ -30,6 +30,8 @@ const menuIcons = {
 };
 
 const Sidebar = ({ isSidebarOpen, setSidebarOpen }) => {
+  const { user, logout } = useAuth(); // Consume user and logout from AuthContext
+
   // Create a utility to render an image icon with default styling
   const createIcon = (src, alt) => <img src={src} alt={alt} className="w-5 h-5" />;
 
@@ -127,27 +129,73 @@ const Sidebar = ({ isSidebarOpen, setSidebarOpen }) => {
           </ul>
         </nav>
 
-        {/* User Profile */}
+        {/* User Profile with Dropdown */}
         <div className="mt-auto border-t pt-4">
-          {isSidebarOpen ? (
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div className="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center font-bold text-white">
-                  P
-                </div>
-                <span className="ml-3 text-sm font-semibold text-gray-800">Praise Dominic</span>
-              </div>
-              <button className="text-gray-500 hover:text-gray-800">
-                {menuIcons.more}
-              </button>
-            </div>
-          ) : (
-            <div className="flex justify-center">
-              <div className="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center font-bold text-white">
-                P
-              </div>
-            </div>
-          )}
+          <Menu as="div" className="relative">
+            {({ open }) => (
+              <>
+                <Menu.Button className={`flex items-center w-full focus:outline-none ${isSidebarOpen ? 'justify-between' : 'justify-center'}`}>
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center font-bold text-white">
+                      {user && user.firstName ? user.firstName.charAt(0).toUpperCase() : 'P'}
+                    </div>
+                    {isSidebarOpen && (
+                      <span className="ml-3 text-sm font-semibold text-gray-800">
+                        {user ? `${user.firstName} ${user.lastName}` : 'Guest User'}
+                      </span>
+                    )}
+                  </div>
+                  {isSidebarOpen && (
+                    <span className="text-gray-500 hover:text-gray-800">
+                      {menuIcons.more}
+                    </span>
+                  )}
+                </Menu.Button>
+
+                <Transition
+                  show={open}
+                  as={Fragment}
+                  enter="transition ease-out duration-100"
+                  enterFrom="transform opacity-0 scale-95"
+                  enterTo="transform opacity-100 scale-100"
+                  leave="transition ease-in duration-75"
+                  leaveFrom="transform opacity-100 scale-100"
+                  leaveTo="transform opacity-0 scale-95"
+                >
+                  <Menu.Items
+                    className={`absolute bottom-full mb-2 ${isSidebarOpen ? 'right-0 w-48' : 'left-full ml-2 w-48'} origin-bottom-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none`}
+                  >
+                    <div className="px-1 py-1 ">
+                      <Menu.Item>
+                        {({ active }) => (
+                          <NavLink
+                            to="/settings" // Link to user settings page
+                            className={`${
+                              active ? 'bg-[#1475F4] text-white' : 'text-gray-900'
+                            } group flex rounded-md items-center w-full px-2 py-2 text-sm`}
+                          >
+                            Edit Profile
+                          </NavLink>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button
+                            onClick={logout} // Call the logout function
+                            className={`${
+                              active ? 'bg-red-500 text-white' : 'text-gray-900'
+                            } group flex rounded-md items-center w-full px-2 py-2 text-sm`}
+                          >
+                            Logout
+                          </button>
+                        )}
+                      </Menu.Item>
+                    </div>
+                  </Menu.Items>
+                </Transition>
+              </>
+            )}
+          </Menu>
         </div>
       </div>
     </>
@@ -155,21 +203,3 @@ const Sidebar = ({ isSidebarOpen, setSidebarOpen }) => {
 };
 
 export default Sidebar;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
