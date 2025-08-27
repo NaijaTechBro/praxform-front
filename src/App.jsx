@@ -36,6 +36,7 @@ import { AuthProvider } from './context/AuthContext';
 import { FormProvider } from './context/FormContext';
 import { SubmissionProvider } from './context/SubmissionContext';
 import { WebhookProvider } from './context/WebhookContext';
+import { AuditProvider } from './context/AuditContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 const App = () => {
@@ -44,6 +45,7 @@ const App = () => {
       <FormProvider>
         <SubmissionProvider>
           <WebhookProvider>
+            <AuditProvider>
             <Router>
               <Routes>
                 {/* --- Public Routes (Accessible to everyone) --- */}
@@ -81,6 +83,7 @@ const App = () => {
                 </Route>
               </Routes>
             </Router>
+            </AuditProvider>
           </WebhookProvider>
         </SubmissionProvider>
       </FormProvider>

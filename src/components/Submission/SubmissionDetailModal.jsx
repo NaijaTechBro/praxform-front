@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FiX, FiLock, FiUnlock, FiMail } from 'react-icons/fi';
+import { FiX, FiLock, FiUnlock } from 'react-icons/fi';
 import CryptoJS from 'crypto-js';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
@@ -69,14 +69,6 @@ const SubmissionDetailModal = ({ submission, formFields, onClose }) => {
                 </button>
                 <h2 className="text-2xl font-bold text-gray-800 mb-2">Submission Details</h2>
                 <p className="text-sm text-gray-500 mb-6">Submitted on: {new Date(submission.createdAt).toLocaleString()}</p>
-
-                {/* Display the recipient email here */}
-                {submission.recipientEmail && (
-                    <div className="flex items-center text-sm text-gray-700 mb-4">
-                        <FiMail className="mr-2" size={16} />
-                        <strong>Recipient:</strong> {submission.recipientEmail}
-                    </div>
-                )}
 
                 {loading ? (
                     <div className="text-center text-gray-500 p-4">Decrypting data...</div>
