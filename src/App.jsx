@@ -12,6 +12,9 @@ import ResendVerification from './pages/Auth/User/ResendVerification';
 import VerifyCode from './pages/Auth/User/VerifyCode';
 import BookADemo from './components/Home/BookADemo';
 
+// New Public Form Page
+import PublicForm from './pages/Submission/PublicForm';
+
 // Protected components that use the Layout
 import Dashboard from './pages/Dashboard';
 import Layout from './components/Layout/Layout';
@@ -26,49 +29,60 @@ import Forms from './pages/Form/Forms';
 import Auditlogs from './pages/Audit/AuditLogs';
 import ChangePassword from './pages/Auth/User/ChangePassword';
 import Submissions from './pages/Submission/Submission';
+import WebhooksPage from './pages/Webhook/WebhooksPage';
 
 // Context Providers
-import { AuthProvider } from './context/AuthContext'; 
+import { AuthProvider } from './context/AuthContext';
 import { FormProvider } from './context/FormContext';
+import { SubmissionProvider } from './context/SubmissionContext';
+import { WebhookProvider } from './context/WebhookContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 const App = () => {
   return (
     <AuthProvider>
       <FormProvider>
-        <Router>
-          <Routes>
-            {/* --- Public Routes (Accessible to everyone) --- */}
-            <Route path="/" element={<HomePage />} />
-            <Route path="/signin" element={<SignIn />} />
-            <Route path="/signup" element={<CreateAccount />} />
-            <Route path="/business-setup" element={<BusinessSetup />} />     
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password/:token" element={<ResetPassword />} />
-            <Route path="/verify-code" element={<VerifyCode />} />
-            <Route path="/resend-verification" element={<ResendVerification />} />
-            <Route path="/demo" element={<BookADemo />} />
+        <SubmissionProvider>
+          <WebhookProvider>
+            <Router>
+              <Routes>
+                {/* --- Public Routes (Accessible to everyone) --- */}
+                <Route path="/" element={<HomePage />} />
+                <Route path="/signin" element={<SignIn />} />
+                <Route path="/signup" element={<CreateAccount />} />
+                <Route path="/business-setup" element={<BusinessSetup />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password/:token" element={<ResetPassword />} />
+                <Route path="/verify-code" element={<VerifyCode />} />
+                <Route path="/resend-verification" element={<ResendVerification />} />
+                <Route path="/demo" element={<BookADemo />} />
 
-            {/* --- Protected Routes (Require authentication) --- */}
-            <Route element={<ProtectedRoute />}>
-              <Route element={<Layout />}>
-                <Route path='/dashboard' element={<Dashboard />} />
-                <Route path='/create-form' element={<NewFormPage />} />
-                <Route path='/templates' element={<Templates />} />
-                <Route path='/templates/ach' element={<Ach />} />
-                <Route path='/templates/w9' element={<W9 />} />
-                <Route path='/templates/credit-card' element={<CreditCard />} />
-                <Route path='/forms' element={<Forms />} />
-                <Route path='/audit-logs' element={<Auditlogs />} />
-                <Route path='/change-password' element={<ChangePassword />} />
-                <Route path='/submissions' element={<Submissions />} />
-              </Route>
-              {/* Full-screen protected routes */}
-              <Route path='/blank-form' element={<BlankFormPage />} />
-              <Route path='/edit-form/:id' element={<EditFormPage />} /> {/* New edit form route */}
-            </Route>
-          </Routes>
-        </Router>
+                {/* The PublicForm route must be public to allow anyone with the link to access it */}
+                <Route path="/form/:formId/:accessCode" element={<PublicForm />} />
+
+                {/* --- Protected Routes (Require authentication) --- */}
+                <Route element={<ProtectedRoute />}>
+                  <Route element={<Layout />}>
+                    <Route path='/dashboard' element={<Dashboard />} />
+                    <Route path='/create-form' element={<NewFormPage />} />
+                    <Route path='/templates' element={<Templates />} />
+                    <Route path='/templates/ach' element={<Ach />} />
+                    <Route path='/templates/w9' element={<W9 />} />
+                    <Route path='/templates/credit-card' element={<CreditCard />} />
+                    <Route path='/forms' element={<Forms />} />
+                    <Route path='/audit-logs' element={<Auditlogs />} />
+                    <Route path='/change-password' element={<ChangePassword />} />
+                    <Route path='/submissions' element={<Submissions />} />
+                    <Route path='/webhooks' element={<WebhooksPage />} />
+                  </Route>
+                  {/* Full-screen protected routes */}
+                  <Route path='/blank-form' element={<BlankFormPage />} />
+                  <Route path='/edit-form/:id' element={<EditFormPage />} />
+                </Route>
+              </Routes>
+            </Router>
+          </WebhookProvider>
+        </SubmissionProvider>
       </FormProvider>
     </AuthProvider>
   );

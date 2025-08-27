@@ -43,7 +43,7 @@ const Sidebar = ({ isSidebarOpen, setSidebarOpen }) => {
   ];
 
   const accountMenuItems = [
-    { name: 'Integrations', icon: createIcon(Integrations, 'Integrations Icon'), path: '/integrations' },
+    { name: 'Webhooks', icon: createIcon(Integrations, 'Integrations Icon'), path: '/webhooks' },
     { name: 'Compliance', icon: createIcon(Compliance, 'Compliance Icon'), path: '/compliance' },
     { name: 'Settings', icon: createIcon(Settings, 'Settings Icon'), path: '/settings' },
     { name: 'Audit Logs', icon: createIcon(AuditLogs, 'Audit Logs Icon'), path: '/audit-logs' },

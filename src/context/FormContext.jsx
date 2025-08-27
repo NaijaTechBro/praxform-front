@@ -83,7 +83,6 @@ export const FormProvider = ({ children }) => {
             status: 'draft',
         };
         try {
-            // Corrected API call: use API_BASE_URL directly for the forms endpoint
             const newForm = await makeAuthenticatedRequest('post', `${API_BASE_URL}/forms`, formPayload);
             setForms((prevForms) => [...prevForms, newForm]);
             setCurrentForm(newForm);
