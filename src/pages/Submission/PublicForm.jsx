@@ -1,15 +1,8 @@
-// NOTE: In a production app, this key should be securely managed and
-// retrieved, likely from an API endpoint, not hardcoded.
-
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import CryptoJS from 'crypto-js';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-
-// The key used for encryption
-const SECRET_KEY = 'a-super-secret-key-for-encryption-and-decryption';
 
 const PublicForm = () => {
     const { formId, accessCode } = useParams();
@@ -19,14 +12,17 @@ const PublicForm = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [submissionSuccess, setSubmissionSuccess] = useState(false);
+    const [encryptionKey, setEncryptionKey] = useState(null); // State to store the key
 
     const API_BASE_URL = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
         const fetchForm = async () => {
             try {
+                // Fetch the form and its unique encryption key from the backend
                 const response = await axios.get(`${API_BASE_URL}/submissions/${formId}/${accessCode}`);
                 setForm(response.data);
+                setEncryptionKey(response.data.encryptionKey);
             } catch (err) {
                 setError(err.response?.data?.message || 'Failed to load form. Invalid URL or expired link.');
             } finally {
@@ -58,10 +54,11 @@ const PublicForm = () => {
             setIsSubmitting(false);
             return;
         }
-
+        
         try {
+            // Use the dynamically fetched encryption key to encrypt the data
             const dataToEncrypt = JSON.stringify(formData);
-            const encryptedString = CryptoJS.AES.encrypt(dataToEncrypt, SECRET_KEY).toString();
+            const encryptedString = CryptoJS.AES.encrypt(dataToEncrypt, encryptionKey).toString();
 
             const payload = {
                 formId,
@@ -101,7 +98,7 @@ const PublicForm = () => {
             </div>
         );
     }
-
+    
     if (submissionSuccess) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-100">
