@@ -65,7 +65,7 @@ const Forms = () => {
 
   const handleEditForm = async (formId) => {
     await getFormById(formId); 
-    navigate(`/edit-form/${formId}`); // Changed navigation to the new edit page
+    navigate(`/forms/edit/${formId}`);
   };
 
   const handleDeleteForm = async (formId) => {

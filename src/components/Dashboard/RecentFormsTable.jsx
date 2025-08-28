@@ -48,7 +48,7 @@ const RecentFormsTable = ({ limit = 5 }) => {
 
   const handleEditForm = async (formId) => {
     await getFormById(formId); 
-    navigate(`/edit-form/${formId}`);
+    navigate(`/forms/edit/${formId}`);
   };
 
   const handleDeleteForm = async (formId) => {

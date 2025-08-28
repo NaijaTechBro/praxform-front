@@ -30,6 +30,7 @@ import Auditlogs from './pages/Audit/AuditLogs';
 import ChangePassword from './pages/Auth/User/ChangePassword';
 import Submissions from './pages/Submission/Submission';
 import WebhooksPage from './pages/Webhook/WebhooksPage';
+import CreateFromTemplatePage from './components/NewForm/CreateFormTemplate';
 
 // Context Providers
 import { AuthProvider } from './context/AuthContext';
@@ -37,6 +38,7 @@ import { FormProvider } from './context/FormContext';
 import { SubmissionProvider } from './context/SubmissionContext';
 import { WebhookProvider } from './context/WebhookContext';
 import { AuditProvider } from './context/AuditContext';
+import { TemplateProvider } from './context/TemplateContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 const App = () => {
@@ -46,6 +48,7 @@ const App = () => {
         <SubmissionProvider>
           <WebhookProvider>
             <AuditProvider>
+            <TemplateProvider>
             <Router>
               <Routes>
                 {/* --- Public Routes (Accessible to everyone) --- */}
@@ -78,11 +81,14 @@ const App = () => {
                     <Route path='/webhooks' element={<WebhooksPage />} />
                   </Route>
                   {/* Full-screen protected routes */}
-                  <Route path='/blank-form' element={<BlankFormPage />} />
-                  <Route path='/edit-form/:id' element={<EditFormPage />} />
+                  <Route path='/forms/new' element={<BlankFormPage />} />
+                  <Route path='/forms/edit/:id' element={<EditFormPage />} />
+
+                  <Route path='/forms/new/template/:templateId' element={<CreateFromTemplatePage />} />
                 </Route>
               </Routes>
             </Router>
+            </TemplateProvider>
             </AuditProvider>
           </WebhookProvider>
         </SubmissionProvider>
@@ -92,3 +98,4 @@ const App = () => {
 };
 
 export default App;
+

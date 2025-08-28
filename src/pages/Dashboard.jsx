@@ -13,7 +13,7 @@ import CompletedIcon from '../assets/statscard/completed.png';
 import TimeIcon from '../assets/statscard/average.png';
 
 const Dashboard = () => {
-  const { forms, getForms, loading: formsLoading, error: formsError } = useForms(); // Renamed loading and error
+  const { forms, getForms, loading: formsLoading, error: formsError } = useForms(); 
 
   useEffect(() => {
     getForms(); // Fetch all forms for dashboard stats when the component mounts

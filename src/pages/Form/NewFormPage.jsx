@@ -17,7 +17,7 @@ const NewFormPage = () => {
   }, [currentForm, clearCurrentForm]);
 
   const handleStartFromScratch = () => {
-    navigate('/blank-form'); 
+    navigate('/forms/new'); 
   };
 
   const handleUseTemplate = () => {
