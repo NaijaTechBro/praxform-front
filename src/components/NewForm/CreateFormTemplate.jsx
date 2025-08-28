@@ -310,3 +310,308 @@ const CreateFromTemplatePage = () => {
 };
 
 export default CreateFromTemplatePage;
+
+
+
+
+
+
+
+
+
+// import React, { useState, useEffect } from 'react';
+// import { useForms } from '../../context/FormContext';
+// import { useTemplates } from '../../context/TemplateContext';
+// import { FiSave, FiEye, FiSend, FiPlus, FiTrash2, FiSettings } from 'react-icons/fi';
+// import ElementPropertiesSidebar from '../../components/NewForm/ElementPropertiesSidebar';
+// import FormFieldsSidebar from '../../components/NewForm/FormFieldsSidebar';
+// import FormBuilderArea from '../../components/NewForm/FormBuilderArea'; // Import FormBuilderArea
+// import FormPreviewModal from '../../components/NewForm/FormPreviewModal';
+// import SendFormModal from '../../components/NewForm/SendFormModal';
+// import { useNavigate, useParams } from 'react-router-dom';
+// import { toast } from 'react-toastify';
+
+// const CreateFromTemplatePage = () => {
+//     const { createForm, updateForm, loading: formsLoading, error: formError, clearError: clearFormError, sendForm } = useForms();
+//     const { getTemplateById, currentTemplate, loading: templatesLoading, error: templateError, clearError: clearTemplateError } = useTemplates();
+//     const navigate = useNavigate();
+//     const { templateId } = useParams();
+
+//     const [formName, setFormName] = useState('New Form from Template');
+//     const [formDescription, setFormDescription] = useState('');
+//     const [formFields, setFormFields] = useState([]); // This state will be passed to FormBuilderArea
+//     const [selectedElement, setSelectedElement] = useState(null);
+//     const [formStatus, setFormStatus] = useState('draft');
+//     const [formId, setFormId] = useState(null);
+//     const [showPreviewModal, setShowPreviewModal] = useState(false);
+//     const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(true);
+//     const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(true);
+//     const [isSaving, setIsSaving] = useState(false);
+//     const [isSending, setIsSending] = useState(false);
+//     const [showSendModal, setShowSendModal] = useState(false);
+
+//     // Helper function to update a field or nested field
+//     const updateFieldInArray = (fields, updatedField) => {
+//         return fields.map(field => {
+//             if (field.id === updatedField.id) {
+//                 return updatedField;
+//             }
+//             if (field.type === 'layout-row' && field.children) {
+//                 return {
+//                     ...field,
+//                     children: updateFieldInArray(field.children, updatedField)
+//                 };
+//             }
+//             return field;
+//         });
+//     };
+
+//     // Helper function to delete a field or nested field
+//     const deleteFieldInArray = (fields, fieldIdToDelete) => {
+//         return fields.filter(field => {
+//             if (field.id === fieldIdToDelete) {
+//                 return false; // Remove this field
+//             }
+//             if (field.type === 'layout-row' && field.children) {
+//                 const updatedChildren = deleteFieldInArray(field.children, fieldIdToDelete);
+//                 return { ...field, children: updatedChildren };
+//             }
+//             return true; // Keep this field
+//         });
+//     };
+
+//     // Fetch template data if templateId is present
+//     useEffect(() => {
+//         if (templateId) {
+//             getTemplateById(templateId);
+//         }
+//     }, [templateId, getTemplateById]);
+
+//     // Populate form states once currentTemplate is loaded
+//     useEffect(() => {
+//         if (currentTemplate) {
+//             setFormId(null); // Ensure new form has no ID until saved
+//             setFormName(`Copy of ${currentTemplate.name}`);
+//             setFormDescription(currentTemplate.description || '');
+//             // Deep copy the fields to ensure immutability and allow independent editing
+//             setFormFields(JSON.parse(JSON.stringify(currentTemplate.fields || [])));
+//             setFormStatus('draft'); // New form from template starts as draft
+//             setSelectedElement(null); // Clear selected element
+//         } else if (!templatesLoading && templateId) {
+//             toast.error('Template not found or could not be loaded.');
+//             navigate('/forms/new'); // Redirect to blank form or template selection
+//         }
+//     }, [currentTemplate, templatesLoading, templateId, navigate]);
+
+//     // Error handling
+//     useEffect(() => {
+//         if (formError) {
+//             toast.error(`Form Error: ${formError}`);
+//             clearFormError();
+//         }
+//         if (templateError) {
+//             toast.error(`Template Error: ${templateError}`);
+//             clearTemplateError();
+//         }
+//     }, [formError, clearFormError, templateError, clearTemplateError]);
+
+//     // This onDeleteField now needs to handle nested deletion
+//     const handleDeleteField = (idToDelete) => {
+//         setFormFields(prevFields => deleteFieldInArray(prevFields, idToDelete));
+//         if (selectedElement && selectedElement.id === idToDelete) {
+//             setSelectedElement(null);
+//         }
+//     };
+
+//     const handleSaveDraft = async () => {
+//         const formData = {
+//             name: formName,
+//             description: formDescription,
+//             fields: formFields, // Save the potentially nested fields
+//             status: 'draft',
+//             template: templateId || undefined, // Link to template if applicable
+//         };
+//         setIsSaving(true);
+//         try {
+//             if (formId) {
+//                 await updateForm(formId, formData);
+//             } else {
+//                 const savedForm = await createForm(formData);
+//                 setFormId(savedForm._id);
+//                 setFormStatus(savedForm.status);
+//             }
+//             toast.success('Form saved successfully!');
+//         } catch (err) {
+//             console.error('Failed to save form:', err);
+//             toast.error('Failed to save form.');
+//         } finally {
+//             setIsSaving(false);
+//         }
+//     };
+
+//     const handleSendForm = () => {
+//         if (!formId) {
+//             toast.error("Please save the form as a draft first before sending.");
+//             return;
+//         }
+//         setShowSendModal(true);
+//     };
+
+//     const handleConfirmSend = async (recipients, message) => {
+//         setIsSending(true);
+//         setShowSendModal(false);
+//         try {
+//             await sendForm(formId, { recipients, message });
+//             setFormStatus('active');
+//             toast.success('Form sent successfully!');
+//             navigate('/forms');
+//         } catch (err) {
+//             console.error('Failed to send form:', err);
+//             toast.error(err.message || 'Failed to send form.');
+//         } finally {
+//             setIsSending(false);
+//         }
+//     };
+
+//     // Handlers for FormBuilderArea buttons
+//     const handleStartFromScratch = () => {
+//         navigate('/forms/new'); // Navigate to the blank form page
+//     };
+
+//     const handleUseTemplate = () => {
+//         navigate('/templates'); // Navigate to the templates listing page
+//     };
+
+//     const isLoadingPage = formsLoading || templatesLoading;
+
+//     if (isLoadingPage) {
+//         return (
+//             <div className="flex h-screen items-center justify-center bg-gray-100 font-sans">
+//                 <p className="text-lg text-gray-700">Loading form...</p>
+//             </div>
+//         );
+//     }
+
+//     return (
+//         <div className="flex h-screen bg-gray-100 font-sans">
+//             {/* Left Sidebar Toggle */}
+//             <div className="absolute top-4 left-4 z-50">
+//                 <button
+//                     onClick={() => setIsLeftSidebarOpen(!isLeftSidebarOpen)}
+//                     className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-gray-600 shadow-md hover:bg-gray-100 transition-colors duration-200 focus:outline-none"
+//                     title={isLeftSidebarOpen ? "Collapse Fields" : "Expand Fields"}
+//                 >
+//                     <FiPlus size={20} className={isLeftSidebarOpen ? 'transform rotate-45' : ''} />
+//                 </button>
+//             </div>
+
+//             {/* Right Sidebar Toggle */}
+//             <div className="absolute top-4 right-4 z-50">
+//                 <button
+//                     onClick={() => setIsRightSidebarOpen(!isRightSidebarOpen)}
+//                     className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-gray-600 shadow-md hover:bg-gray-100 transition-colors duration-200 focus:outline-none"
+//                     title={isRightSidebarOpen ? "Collapse Properties" : "Expand Properties"}
+//                 >
+//                     <FiSettings size={20} />
+//                 </button>
+//             </div>
+
+//             {/* Left Sidebar for Form Fields (Toggable) */}
+//             <div
+//                 className={`fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200 p-4 transition-transform duration-300 ease-in-out transform ${
+//                     isLeftSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+//                 }`}
+//             >
+//                 <FormFieldsSidebar />
+//             </div>
+
+//             {/* Main Content Area */}
+//             <div
+//                 className={`flex-1 flex flex-col p-6 transition-all duration-300 ease-in-out
+//                     ${isLeftSidebarOpen ? 'ml-64' : 'ml-0'}
+//                     ${isRightSidebarOpen ? 'mr-80' : 'mr-0'}`}
+//             >
+//                 {/* Top Action Bar */}
+//                 <div className="flex-none mb-6 flex items-center justify-between bg-white p-4 py-3 rounded-lg shadow-sm">
+//                     <input
+//                         type="text"
+//                         className="text-xl font-semibold text-gray-800 md:text-2xl whitespace-nowrap bg-transparent outline-none border-b border-transparent focus:border-gray-400 transition-colors duration-200"
+//                         value={formName}
+//                         onChange={(e) => setFormName(e.target.value)}
+//                     />
+//                     <div className="flex items-center space-x-3">
+//                         <span className={`px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full whitespace-nowrap`}>
+//                             {formStatus}
+//                         </span>
+//                         <button
+//                             onClick={() => setShowPreviewModal(true)}
+//                             className="flex items-center text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors duration-200 focus:outline-none whitespace-nowrap"
+//                         >
+//                             <FiEye className="mr-2" size={16} />
+//                             Preview
+//                         </button>
+//                         <button
+//                             onClick={handleSaveDraft}
+//                             className="flex items-center text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors duration-200 focus:outline-none whitespace-nowrap"
+//                             disabled={isSaving || isSending}
+//                         >
+//                             {isSaving ? 'Saving...' : <><FiSave className="mr-2" size={16} /> Save Draft</>}
+//                         </button>
+//                         <button
+//                             onClick={handleSendForm}
+//                             className="bg-[#1475F4] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors duration-200 focus:outline-none flex items-center whitespace-nowrap"
+//                             disabled={isSaving || isSending}
+//                         >
+//                             {isSending ? 'Sending...' : <><FiSend className="mr-2" size={16} /> Send Form</>}
+//                         </button>
+//                     </div>
+//                 </div>
+
+//                 {/* Form Design Area - Now handled by FormBuilderArea */}
+//                 <FormBuilderArea
+//                     formFields={formFields}
+//                     setFormFields={setFormFields}
+//                     selectedElement={selectedElement}
+//                     setSelectedElement={setSelectedElement}
+//                     onDeleteField={handleDeleteField}
+//                     onStartFromScratch={handleStartFromScratch}
+//                     onUseTemplate={handleUseTemplate}
+//                 />
+//             </div>
+
+//             {/* Right Sidebar for Element Properties (Toggable) */}
+//             <div
+//                 className={`fixed inset-y-0 right-0 z-40 w-80 bg-white border-l border-gray-200 transition-transform duration-300 ease-in-out transform ${
+//                     isRightSidebarOpen ? 'translate-x-0' : 'translate-x-full'
+//                 }`}
+//             >
+//                 <ElementPropertiesSidebar
+//                     selectedElement={selectedElement}
+//                     onUpdate={(updatedElement) => {
+//                         setSelectedElement(updatedElement);
+//                         setFormFields(prevFields => updateFieldInArray(prevFields, updatedElement));
+//                     }}
+//                 />
+//             </div>
+
+//             {/* Form Preview Modal */}
+//             <FormPreviewModal
+//                 show={showPreviewModal}
+//                 onClose={() => setShowPreviewModal(false)}
+//                 formName={formName}
+//                 formDescription={formDescription}
+//                 formFields={formFields}
+//             />
+
+//             {/* Send Form Modal */}
+//             <SendFormModal
+//                 show={showSendModal}
+//                 onClose={() => setShowSendModal(false)}
+//                 onSend={handleConfirmSend}
+//                 formName={formName}
+//             />
+//         </div>
+//     );
+// };
+
+// export default CreateFromTemplatePage;

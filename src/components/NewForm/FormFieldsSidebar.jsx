@@ -1,8 +1,8 @@
-// src/components/newForm/FormFieldsSidebar.jsx
 import React from 'react';
-import { FaTextHeight, FaCalendarAlt, FaSearch, FaFileUpload, FaIdCard, FaSignature } from 'react-icons/fa';
+import { FaTextHeight, FaCalendarAlt, FaSearch, FaFileUpload, FaIdCard, FaSignature, FaLink, FaListUl, FaCheckSquare, FaDotCircle, FaAlignLeft } from 'react-icons/fa';
 import { IoMdKey } from 'react-icons/io';
 import { MdEmail } from 'react-icons/md';
+import { GrGroup } from 'react-icons/gr'; // Icon for layout row
 
 const FormFieldsSidebar = () => {
   const handleDragStart = (e, fieldType) => {
@@ -11,15 +11,25 @@ const FormFieldsSidebar = () => {
 
   const basicFields = [
     { name: 'Text Field', icon: <FaTextHeight size={16} className="text-gray-500" />, type: 'text' },
+    { name: 'Text Area', icon: <FaAlignLeft size={16} className="text-gray-500" />, type: 'textarea' },
     { name: 'Number', icon: <IoMdKey size={16} className="text-gray-500" />, type: 'number' },
     { name: 'Date Picker', icon: <FaCalendarAlt size={16} className="text-gray-500" />, type: 'date' },
     { name: 'Email Field', icon: <MdEmail size={16} className="text-gray-500" />, type: 'email' },
     { name: 'File Upload', icon: <FaFileUpload size={16} className="text-gray-500" />, type: 'file' },
+    { name: 'Embed Link', icon: <FaLink size={16} className="text-gray-500" />, type: 'embed' }, // New field type
   ];
 
   const selectionFields = [
+    { name: 'Checkbox', icon: <FaCheckSquare size={16} className="text-gray-500" />, type: 'checkbox' }, // New field type
+    { name: 'Radio Group', icon: <FaDotCircle size={16} className="text-gray-500" />, type: 'radio-group' }, // New field type for multiple radio options
+    { name: 'Select (Dropdown)', icon: <FaListUl size={16} className="text-gray-500" />, type: 'select' }, // New field type
     { name: 'SSN', icon: <FaIdCard size={16} className="text-gray-500" />, type: 'ssn' },
     { name: 'Signature', icon: <FaSignature size={16} className="text-gray-500" />, type: 'signature' },
+  ];
+
+  // New layout fields section
+  const layoutFields = [
+    { name: 'Layout Row', icon: <GrGroup size={16} className="text-gray-500" />, type: 'layout-row' }, // Crucial for side-by-side
   ];
 
   const FieldItem = ({ name, icon, type }) => (
@@ -56,8 +66,15 @@ const FormFieldsSidebar = () => {
       </div>
 
       <h3 className="text-xs font-semibold uppercase text-gray-500 mb-2">Selection Fields</h3>
-      <div className="space-y-2">
+      <div className="space-y-2 mb-6">
         {selectionFields.map((field) => (
+          <FieldItem key={field.type} {...field} />
+        ))}
+      </div>
+
+      <h3 className="text-xs font-semibold uppercase text-gray-500 mb-2">Layout Elements</h3>
+      <div className="space-y-2">
+        {layoutFields.map((field) => (
           <FieldItem key={field.type} {...field} />
         ))}
       </div>
