@@ -57,7 +57,7 @@ const App = () => {
                 <Route path="/signup" element={<CreateAccount />} />
                 <Route path="/business-setup" element={<BusinessSetup />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/reset-password/:token" element={<ResetPassword />} />
+                <Route path="/reset-password/:resetToken" element={<ResetPassword />} />
                 <Route path="/verify-code" element={<VerifyCode />} />
                 <Route path="/resend-verification" element={<ResendVerification />} />
                 <Route path="/demo" element={<BookADemo />} />
