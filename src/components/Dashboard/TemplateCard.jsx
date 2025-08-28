@@ -1,8 +1,7 @@
 import React from 'react';
 import { FileText, MoreVertical } from 'lucide-react';
 
-const TemplateCard = ({ template, onUse }) => { // Receives 'template' object and 'onUse' function
-  // Defensive check: If template is undefined, don't try to render it.
+const TemplateCard = ({ template, onUse }) => { 
   if (!template) {
     console.error("TemplateCard received an undefined template prop. This might indicate an issue with data fetching or filtering in the parent component.");
     return null; 
@@ -14,8 +13,8 @@ const TemplateCard = ({ template, onUse }) => { // Receives 'template' object an
       case 'yellow': return 'bg-yellow-100 text-yellow-600';
       case 'blue': return 'bg-blue-100 text-blue-600';
       case 'red': return 'bg-red-100 text-red-600';
-      case 'purple': return 'bg-purple-100 text-purple-600'; // Added for potential 'survey' category
-      case 'orange': return 'bg-orange-100 text-orange-600'; // Added for potential 'survey' category
+      case 'purple': return 'bg-purple-100 text-purple-600'; 
+      case 'orange': return 'bg-orange-100 text-orange-600'; 
       default: return 'bg-gray-100 text-gray-600';
     }
   };
@@ -40,14 +39,11 @@ const TemplateCard = ({ template, onUse }) => { // Receives 'template' object an
           </button>
         </div>
         {/* Template description with a more compact line-height */}
-        <p className="text-gray-500 text-xs mb-3 leading-snug">{template.description}</p> {/* Uses template.description */}
+        <p className="text-gray-500 text-xs mb-3 leading-snug">{template.description}</p>
       </div>
       {/* Footer with usage count and "Use Template" button */}
       <div className="border-t border-gray-100 px-4 py-3 flex justify-between items-center">
-        {/* Note: `usageCount` is not directly part of the FormTemplate model.
-            If you need this, you would calculate it (e.g., count Forms created from this template)
-            and pass it as an additional prop to TemplateCard, or derive it in Templates.jsx.
-            For now, it will display 0 or whatever default you set. */}
+       
         <p className="text-gray-500 text-[10px]">Used {template.usageCount || 0} times</p>
         <button
           onClick={onUse}

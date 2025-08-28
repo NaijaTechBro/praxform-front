@@ -1,48 +1,6 @@
-// import React, { useState } from 'react';
-// import { ShieldCheck, Eye, EyeOff} from 'lucide-react';
-
-// const InputField = ({ id, label, type = 'text', placeholder, hasError, isValid }) => {
-//     const [isPasswordVisible, setPasswordVisible] = useState(false);
-
-//     const togglePasswordVisibility = () => {
-//         setPasswordVisible(!isPasswordVisible);
-//     };
-
-//     return (
-//         <div>
-//             {label && <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">{label}</label>}
-//             <div className="relative">
-//                 <input
-//                     id={id}
-//                     type={isPasswordVisible ? 'text' : type}
-//                     placeholder={placeholder}
-//                     className={`w-full py-3 px-4 pr-10 rounded-lg border text-gray-800 placeholder-gray-400
-//                         ${hasError ? 'border-red-500' : 'border-gray-300'}
-//                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition`}
-//                 />
-//                 {type === 'password' && (
-//                     <button type="button" onClick={togglePasswordVisibility} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-//                         {isPasswordVisible ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-//                     </button>
-//                 )}
-//                  {isValid && !hasError && (
-//                      <ShieldCheck className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-green-500" />
-//                  )}
-//             </div>
-//         </div>
-//     );
-// };
-
-// export default InputField;
-
-
-
-// src/components/Auth/InputField.jsx
-
 import React, { useState } from 'react';
-import { Eye, EyeOff, ShieldCheck } from 'lucide-react';
 
-const InputField = ({ id, label, type = 'text', placeholder, hasError, isValid, value = '', onChange }) => {
+const InputField = ({ id, label, type = 'text', placeholder, hasError, value = '', onChange }) => {
     const [isPasswordVisible, setPasswordVisible] = useState(false);
 
     const togglePasswordVisibility = () => {
@@ -50,30 +8,30 @@ const InputField = ({ id, label, type = 'text', placeholder, hasError, isValid, 
     };
 
     return (
-        <div>
-            {label && <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">{label}</label>}
+        <div className="space-y-1">
+            {label && <label htmlFor={id} className="block text-sm font-semibold text-gray-700">{label}</label>}
             <div className="relative">
                 <input
                     id={id}
                     type={isPasswordVisible ? 'text' : type}
                     placeholder={placeholder}
-                    value={value} // Pass a value, even an empty string, to keep it controlled
+                    value={value}
                     onChange={onChange}
-                    className={`w-full py-3 px-4 pr-10 rounded-lg border text-gray-800 placeholder-gray-400
+                    className={`w-full py-3 px-4 ${type === 'password' ? 'pr-10' : ''} rounded-lg border text-gray-800 placeholder-gray-400
                         ${hasError ? 'border-red-500' : 'border-gray-300'}
                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition`}
                 />
                 {type === 'password' && (
                     <button type="button" onClick={togglePasswordVisibility} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                        {isPasswordVisible ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                        {isPasswordVisible
+                            ? <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-eye-off"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.749 9.749 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
+                            : <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-eye"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        }
                     </button>
                 )}
-                {isValid && !hasError && (
-                    <ShieldCheck className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-green-500" />
-                )}
             </div>
+            {hasError && <p className="text-red-500 text-xs mt-1">{hasError}</p>}
         </div>
     );
 };
-
 export default InputField;

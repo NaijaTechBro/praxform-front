@@ -1,14 +1,13 @@
-// src/components/dashboard/StatsCard.jsx
 import React from 'react';
 import { FiArrowUp, FiArrowDown } from 'react-icons/fi';
 
 const StatsCard = ({ icon, title, value, previousValue }) => {
-  // Ensure value and previousValue are numbers for calculation
+
   const currentValue = typeof value === 'number' ? value : 0;
   const prevValue = typeof previousValue === 'number' ? previousValue : 0;
 
   let change = 0;
-  let trend = 'neutral'; // 'up', 'down', 'neutral'
+  let trend = 'neutral'; 
 
   if (prevValue !== 0) {
     change = ((currentValue - prevValue) / prevValue) * 100;

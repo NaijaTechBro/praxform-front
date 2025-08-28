@@ -104,9 +104,9 @@ const SignIn = ({ setPage}) => {
           <div className="text-center">
             <p className="text-sm text-gray-600">
                 Don't have an account?{' '}
-                <button onClick={() => setPage('createAccount')} className="font-semibold text-blue-600 hover:underline">
+                <a href='/signup' className="font-semibold text-blue-600 hover:underline">
                     Create Account
-                </button>
+                </a>
             </p>
         </div>
         </div>

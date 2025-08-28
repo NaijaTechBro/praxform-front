@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import TemplateCard from './TemplateCard'; // Adjust path if necessary
-import { useTemplates } from '../../context/TemplateContext'; // Import useTemplates context
-import { FaSearch } from 'react-icons/fa'; // Using react-icons for search icon
+import TemplateCard from './TemplateCard'; 
+import { useTemplates } from '../../context/TemplateContext'; 
+import { FaSearch } from 'react-icons/fa'; 
 
 const TemplateLibrary = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -60,7 +60,7 @@ const TemplateLibrary = () => {
     };
 
     return (
-        <div className="bg-white rounded-xl shadow-md p-6"> {/* Adjusted styling for dashboard integration */}
+        <div className="bg-white rounded-xl shadow-md p-6"> 
             <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-4 md:mb-0">Template Library</h3>
                 <div className="relative flex-grow md:max-w-xs mb-4 md:mb-0">

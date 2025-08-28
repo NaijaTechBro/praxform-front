@@ -37,14 +37,13 @@ const BusinessSetup = ({ setPage }) => {
             name: orgName,
             industry: industry,
         },
-        // Optional fields from the form can be added here
     };
 
     const result = await register(userData);
     
     if (result.success) {
       localStorage.removeItem('tempUserData');
-      // On successful registration, redirect to a page that tells the user to check their email
+      // On successful registration, redirect to a verification page
       navigate('/verify-code'); 
     } else {
       setLocalError(result.message || error);
