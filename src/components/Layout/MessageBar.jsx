@@ -9,7 +9,7 @@ const MessageBar = () => {
     if (message) {
       const timer = setTimeout(() => {
         setMessage(null);
-      }, 5000); // Message disappears after 5 seconds
+      }, 5000); 
       return () => clearTimeout(timer);
     }
   }, [message, setMessage]);

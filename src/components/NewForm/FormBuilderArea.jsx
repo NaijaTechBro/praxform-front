@@ -45,7 +45,7 @@ const FormBuilderArea = ({
         // For now, we'll keep the row even if empty, but this can be a design choice.
         return { ...field, children: updatedChildren };
       }
-      return true; // Keep this field
+      return true;
     });
   };
 

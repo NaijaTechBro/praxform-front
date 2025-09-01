@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom'; // 1. Import Outlet
+import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
 
-const Layout = () => { // You can remove the {children} prop
+const Layout = () => { 
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
   return (
@@ -15,8 +15,6 @@ const Layout = () => { // You can remove the {children} prop
         <Header setSidebarOpen={setSidebarOpen} />
         
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4 md:p-8">
-          {/* 2. Replace {children} with <Outlet /> */}
-          {/* This is where the nested route's component will be rendered */}
           <Outlet />
         </main>
       </div>

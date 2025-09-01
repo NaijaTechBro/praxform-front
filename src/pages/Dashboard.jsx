@@ -37,8 +37,6 @@ const Dashboard = () => {
       }, 0)
     : 0;
 
-  // For demonstration, let's assume some arbitrary previous values for trend calculation.
-  // In a real production app, you would fetch these from a backend or calculate based on historical data.
   const previousTotalForms = 10;
   const previousActiveForms = 3;
   const previousDraftForms = 5;
@@ -52,10 +50,8 @@ const Dashboard = () => {
     { title: 'Completed Submissions', value: completedForms, previousValue: previousCompletedForms, icon: createIcon(CompletedIcon, 'completed Icon') },
   ];
 
-  // Removed the explicit `if (formsLoading)` block.
-  // The components will now render immediately with their default/initial states.
 
-  if (formsError) { // Keep error display as it's critical
+  if (formsError) { 
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <p className="text-lg text-red-700">Error loading dashboard: {formsError}</p>
