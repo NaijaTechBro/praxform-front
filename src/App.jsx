@@ -31,6 +31,7 @@ import ChangePassword from './pages/Auth/User/ChangePassword';
 import Submissions from './pages/Submission/Submission';
 import WebhooksPage from './pages/Webhook/WebhooksPage';
 import CreateFromTemplatePage from './components/NewForm/CreateFormTemplate';
+import SettingsPage from './pages/Settings/SettingsPage';
 
 // Context Providers
 import { AuthProvider } from './context/AuthContext';
@@ -39,7 +40,7 @@ import { SubmissionProvider } from './context/SubmissionContext';
 import { WebhookProvider } from './context/WebhookContext';
 import { AuditProvider } from './context/AuditContext';
 import { TemplateProvider } from './context/TemplateContext';
-import ProtectedRoute from './components/auth/ProtectedRoute';
+import ProtectedRoute from './components/Auth/ProtectedRoute';
 
 const App = () => {
   return (
@@ -79,6 +80,7 @@ const App = () => {
                     <Route path='/change-password' element={<ChangePassword />} />
                     <Route path='/submissions' element={<Submissions />} />
                     <Route path='/webhooks' element={<WebhooksPage />} />
+                    <Route path='/settings' element={<SettingsPage />} />
                   </Route>
                   {/* Full-screen protected routes */}
                   <Route path='/forms/new' element={<BlankFormPage />} />

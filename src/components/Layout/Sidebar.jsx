@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Menu, Transition } from '@headlessui/react'; // Import Menu and Transition
-import { Fragment } from 'react'; // Import Fragment for Transition
+import { Menu, Transition } from '@headlessui/react';
+import { Fragment } from 'react'; 
 
 // Import local image assets
 import logo from '../../assets/logo.png';
@@ -14,7 +14,7 @@ import Integrations from '../../assets/sidebar/integration.png';
 import Compliance from '../../assets/sidebar/compliance.png';
 import Settings from '../../assets/sidebar/setting.png';
 import AuditLogs from '../../assets/sidebar/audit.png';
-import { useAuth } from '../../context/AuthContext'; // Import useAuth hook
+import { useAuth } from '../../context/AuthContext';
 
 // Inline SVG icons for collapse button and more options
 const menuIcons = {
@@ -44,7 +44,7 @@ const Sidebar = ({ isSidebarOpen, setSidebarOpen }) => {
 
   const accountMenuItems = [
     { name: 'Webhooks', icon: createIcon(Integrations, 'Integrations Icon'), path: '/webhooks' },
-    { name: 'Compliance', icon: createIcon(Compliance, 'Compliance Icon'), path: '/compliance' },
+    // { name: 'Compliance', icon: createIcon(Compliance, 'Compliance Icon'), path: '/compliance' },
     { name: 'Settings', icon: createIcon(Settings, 'Settings Icon'), path: '/settings' },
     { name: 'Audit Logs', icon: createIcon(AuditLogs, 'Audit Logs Icon'), path: '/audit-logs' },
   ];
