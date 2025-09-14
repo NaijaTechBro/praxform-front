@@ -18,7 +18,7 @@ const CreateAccount = () => {
 
     const navigate = useNavigate();
 
-    const { loading } = useAuth();
+    const { loading, googleAuth } = useAuth();
 
  const handleGoogleSuccess = async (codeResponse) => {
         // The 'code' received here is the authorization code

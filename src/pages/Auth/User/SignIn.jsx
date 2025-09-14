@@ -13,7 +13,7 @@ const SignIn = () => {
   const [password, setPassword] = useState('');
   const [localError, setLocalError] = useState('');
   
-  const { login, loading, error } = useAuth();
+  const { login, loading, error, googleAuth } = useAuth();
   const navigate = useNavigate();
 
   const handleSignIn = async (e) => {
@@ -28,7 +28,6 @@ const SignIn = () => {
     
     if (result.success) {
       if (result.mfaRequired) {
-        // Navigate to the MFA page, passing the email along
         navigate('/login-code', { state: { email } });
       } else {
         toast.success("Successfully signed in!");
@@ -39,9 +38,26 @@ const SignIn = () => {
     }
   };
 
-  const loginWithGoogle = useGoogleLogin({
-    flow: 'auth-code',
-  });
+  const handleGoogleSuccess = async (codeResponse) => {
+        const result = await googleAuth(codeResponse.code);
+        if (result.success) {
+            toast.success("Successfully signed in with Google!");
+            navigate('/dashboard');
+        } else {
+            setLocalError(result.message || "Google authentication failed.");
+        }
+    };
+
+  const handleGoogleError = (error) => {
+        console.error("Google Login Failed:", error);
+        toast.error("Google login failed. Please try again.");
+    };
+
+ const loginWithGoogle = useGoogleLogin({
+        flow: 'auth-code',
+        onSuccess: handleGoogleSuccess,
+        onError: handleGoogleError,
+    });
 
   return (
     <>
