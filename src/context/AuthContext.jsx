@@ -43,47 +43,49 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    useEffect(() => {
-        // Remove old interceptor to avoid multiple instances
-        if (axiosInterceptor.current) {
-            axios.interceptors.request.eject(axiosInterceptor.current);
-        }
+useEffect(() => {
+    // This part sets up the request interceptor to add the auth token to every request.
+    // It remains unchanged.
+    const requestInterceptor = axios.interceptors.request.use(
+        (config) => {
+            if (token && !config.headers['Authorization']) {
+                config.headers['Authorization'] = `Bearer ${token}`;
+            }
+            return config;
+        },
+        (err) => Promise.reject(err)
+    );
 
-        axiosInterceptor.current = axios.interceptors.request.use(
-            (config) => {
-                if (token && config.headers['Authorization'] !== `Bearer ${token}`) {
-                    config.headers['Authorization'] = `Bearer ${token}`;
+    // This is the updated response interceptor with the smarter logic.
+    const responseInterceptor = axios.interceptors.response.use(
+        (response) => response,
+        async (err) => {
+            const originalRequest = err.config;
+
+            // Check if the error is a 401 and we haven't already retried this specific request.
+            if (err.response?.status === 401 && !originalRequest._retry) {
+                
+                // Mark this request as retried to prevent infinite loops.
+                originalRequest._retry = true;
+
+                // --- FIX: Logic to exclude certain URLs from token refresh ---
+                // List of API paths where a 401 should NOT trigger a refresh.
+                const urlsToExclude = [
+                    '/auth/login',
+                    '/auth/verify-mfa',
+                    '/auth/register',
+                    '/auth/refresh-token' // Exclude the refresh endpoint itself.
+                ];
+
+                // If the failed request's URL is on the exclusion list, don't try to refresh.
+                // Just pass the original error back to the component that made the call.
+                if (urlsToExclude.some(url => originalRequest.url.endsWith(url))) {
+                    return Promise.reject(err);
                 }
-                return config;
-            },
-            (err) => Promise.reject(err)
-        );
+                // --- END OF FIX ---
 
-        axios.interceptors.response.use(
-            (response) => response,
-            async (err) => {
-                const originalRequest = err.config;
-
-                // If error is 401 and not a refresh token request
-                if (err.response?.status === 401 && originalRequest.url !== `${API_BASE_URL}/auth/refresh-token`) {
-                    if (!isRefreshing.current) {
-                        isRefreshing.current = true;
-                        try {
-                            const response = await axios.post(`${API_BASE_URL}/auth/refresh-token`);
-                            const newAccessToken = response.data.accessToken;
-                            localStorage.setItem('userToken', newAccessToken);
-                            setToken(newAccessToken);
-                            onRefreshed(newAccessToken);
-                        } catch (refreshErr) {
-                            toast.error('Session expired. Please log in again.');
-                            logout();
-                            return Promise.reject(refreshErr);
-                        } finally {
-                            isRefreshing.current = false;
-                        }
-                    }
-
-                    // Queue the original request
+                // If a token refresh is already in progress, queue this request.
+                if (isRefreshing.current) {
                     return new Promise(resolve => {
                         subscribeTokenRefresh(newToken => {
                             originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
@@ -91,17 +93,43 @@ export const AuthProvider = ({ children }) => {
                         });
                     });
                 }
-                
-                return Promise.reject(err);
+
+                // If we get here, it's a genuine session expiry, so attempt to refresh the token.
+                isRefreshing.current = true;
+                try {
+                    const response = await axios.post(`${API_BASE_URL}/auth/refresh-token`);
+                    const newAccessToken = response.data.accessToken;
+
+                    localStorage.setItem('userToken', newAccessToken);
+                    setToken(newAccessToken);
+                    onRefreshed(newAccessToken);
+
+                    // Update the header of the original failed request with the new token.
+                    originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+                    
+                    // Retry the original request with the new token.
+                    return axios(originalRequest);
+
+                } catch (refreshErr) {
+                    toast.error('Session expired. Please log in again.');
+                    logout(); // Your existing logout function
+                    return Promise.reject(refreshErr);
+                } finally {
+                    isRefreshing.current = false;
+                }
             }
-        );
-        
-        // Cleanup function for when the component unmounts
-        return () => {
-            axios.interceptors.response.eject(axiosInterceptor.current);
-            axios.interceptors.request.eject(axiosInterceptor.current);
-        };
-    }, [token, API_BASE_URL]);
+            
+            // For any other errors, just reject the promise.
+            return Promise.reject(err);
+        }
+    );
+    
+    // Cleanup function to remove interceptors when the component unmounts.
+    return () => {
+        axios.interceptors.request.eject(requestInterceptor);
+        axios.interceptors.response.eject(responseInterceptor);
+    };
+}, [token, API_BASE_URL]);
 
 
     useEffect(() => {

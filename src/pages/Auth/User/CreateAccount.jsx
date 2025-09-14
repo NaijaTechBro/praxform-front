@@ -119,7 +119,8 @@ const handleGoogleSuccess = async (codeResponse) => {
                         <hr className="w-full border-gray-300" /><span className="px-4 text-sm font-medium text-gray-500">OR</span><hr className="w-full border-gray-300" />
                     </div>
                                 <form onSubmit={handleNext} className="space-y-6">
-                                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">                                       <InputField
+                                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">                                       
+                                    <InputField
                                         id="firstName"
                                         label="First Name"
                                         placeholder="Dominic"
