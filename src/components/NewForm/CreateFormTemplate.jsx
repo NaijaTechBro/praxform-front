@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useForms } from '../../context/FormContext';
-import { useTemplates } from '../../context/TemplateContext'; // New import
+import { useTemplates } from '../../context/TemplateContext'; 
 import { FiSave, FiEye, FiSend, FiPlus, FiTrash2, FiSettings } from 'react-icons/fi';
 import ElementPropertiesSidebar from '../../components/NewForm/ElementPropertiesSidebar';
 import FormFieldsSidebar from '../../components/NewForm/FormFieldsSidebar';
 import FormPreviewModal from '../../components/NewForm/FormPreviewModal';
 import SendFormModal from '../../components/NewForm/SendFormModal';
-import { useNavigate, useParams } from 'react-router-dom'; // Import useParams
+import { useNavigate, useParams } from 'react-router-dom'; 
 import { toast } from 'react-toastify';
 
 const CreateFromTemplatePage = () => {
     const { createForm, updateForm, loading: formsLoading, error: formError, clearError: clearFormError, sendForm } = useForms();
     const { getTemplateById, currentTemplate, loading: templatesLoading, error: templateError, clearError: clearTemplateError } = useTemplates(); // Use TemplateContext
     const navigate = useNavigate();
-    const { templateId } = useParams(); // Get templateId from URL if using routes like /forms/new/:templateId
+    const { templateId } = useParams(); 
 
     const [formName, setFormName] = useState('New Form from Template');
     const [formDescription, setFormDescription] = useState('');
@@ -44,7 +44,7 @@ const CreateFromTemplatePage = () => {
             setFormFields(JSON.parse(JSON.stringify(currentTemplate.fields || [])));
         } else if (!templatesLoading && templateId) {
             toast.error('Template not found or could not be loaded.');
-            navigate('/forms/new'); // Redirect to blank form or template selection
+            navigate('/forms/new');
         }
     }, [currentTemplate, templatesLoading, templateId, navigate]);
 
@@ -99,7 +99,7 @@ const CreateFromTemplatePage = () => {
             description: formDescription,
             fields: formFields,
             status: 'draft',
-            template: templateId || undefined, // Link to template if applicable
+            template: templateId || undefined,
         };
         setIsSaving(true);
         try {

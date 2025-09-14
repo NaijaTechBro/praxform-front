@@ -1,11 +1,14 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // Public pages
 import HomePage from './pages/Home';
 import SignIn from './pages/Auth/User/SignIn';
 import CreateAccount from './pages/Auth/User/CreateAccount';
 import BusinessSetup from './pages/Auth/User/BusinessSetup';
+import GoogleCallback from './pages/Auth/User/GoogleCallBack';
+import LoginCode from './pages/Auth/User/LoginCode';
 import ForgotPassword from './pages/Auth/User/ForgotPassword';
 import ResetPassword from './pages/Auth/User/ResetPassword';
 import ResendVerification from './pages/Auth/User/ResendVerification';
@@ -44,6 +47,7 @@ import ProtectedRoute from './components/Auth/ProtectedRoute';
 
 const App = () => {
   return (
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
     <AuthProvider>
       <FormProvider>
         <SubmissionProvider>
@@ -56,6 +60,8 @@ const App = () => {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/signin" element={<SignIn />} />
                 <Route path="/signup" element={<CreateAccount />} />
+                <Route path="/login-code" element={<LoginCode />} />
+                <Route path="/auth/google/callback" element={<GoogleCallback />} />
                 <Route path="/business-setup" element={<BusinessSetup />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password/:resetToken" element={<ResetPassword />} />
@@ -96,6 +102,7 @@ const App = () => {
         </SubmissionProvider>
       </FormProvider>
     </AuthProvider>
+    </GoogleOAuthProvider>
   );
 };
 

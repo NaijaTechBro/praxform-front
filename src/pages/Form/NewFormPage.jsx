@@ -1,9 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useForms } from '../../context/FormContext';
-import { FiPlus, FiChevronLeft, FiChevronRight, FiEdit2, FiEye, FiSave, FiSend, FiSettings } from 'react-icons/fi';
-import FormFieldsSidebar from '../../components/NewForm/FormFieldsSidebar';
 import FormBuilderArea from '../../components/NewForm/FormBuilderArea';
-import create from '../../assets/statscard/create.png';
 import { useNavigate } from 'react-router-dom';
 
 const NewFormPage = () => {
