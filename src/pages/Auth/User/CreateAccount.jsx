@@ -20,15 +20,16 @@ const CreateAccount = () => {
 
     const { loading, googleAuth } = useAuth();
 
- const handleGoogleSuccess = async (codeResponse) => {
-        // The 'code' received here is the authorization code
+const handleGoogleSuccess = async (codeResponse) => {
         const result = await googleAuth(codeResponse.code);
+        
         if (result.success) {
-            toast.success("Successfully signed in with Google!");
-            navigate('/dashboard'); // Redirect to dashboard on success
+            // A new user created via Google is logged in directly
+            toast.success("Welcome! Your account has been created successfully with Google.");
+            navigate('/dashboard');
         } else {
-            // Display the error message from the backend
-            toast.error(result.message || "Google authentication failed.");
+            // Display any error from the backend (e.g., if something went wrong during user creation)
+            toast.error(result.message || "Google sign-up failed.");
         }
     };
 

@@ -7,7 +7,6 @@ import HomePage from './pages/Home';
 import SignIn from './pages/Auth/User/SignIn';
 import CreateAccount from './pages/Auth/User/CreateAccount';
 import BusinessSetup from './pages/Auth/User/BusinessSetup';
-import GoogleCallback from './pages/Auth/User/GoogleCallBack';
 import LoginCode from './pages/Auth/User/LoginCode';
 import ForgotPassword from './pages/Auth/User/ForgotPassword';
 import ResetPassword from './pages/Auth/User/ResetPassword';
@@ -61,7 +60,6 @@ const App = () => {
                 <Route path="/signin" element={<SignIn />} />
                 <Route path="/signup" element={<CreateAccount />} />
                 <Route path="/login-code" element={<LoginCode />} />
-                <Route path="/auth/google/callback" element={<GoogleCallback />} />
                 <Route path="/business-setup" element={<BusinessSetup />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password/:resetToken" element={<ResetPassword />} />
