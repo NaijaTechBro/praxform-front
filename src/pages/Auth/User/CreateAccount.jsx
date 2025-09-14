@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../../context/AuthContext';
+import { useGoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import InputField from '../../../components/Auth/InputField';
 import PasswordCriteria from '../../../components/Auth/PasswordCriteria';
 import Header from '../../../components/Auth/Header';
+import google from '../../../assets/google.svg';
 
 
 const CreateAccount = () => {
@@ -14,6 +18,31 @@ const CreateAccount = () => {
 
     const navigate = useNavigate();
 
+    const { loading } = useAuth();
+
+ const handleGoogleSuccess = async (codeResponse) => {
+        // The 'code' received here is the authorization code
+        const result = await googleAuth(codeResponse.code);
+        if (result.success) {
+            toast.success("Successfully signed in with Google!");
+            navigate('/dashboard'); // Redirect to dashboard on success
+        } else {
+            // Display the error message from the backend
+            toast.error(result.message || "Google authentication failed.");
+        }
+    };
+
+    const handleGoogleError = (error) => {
+        console.error("Google Login Failed:", error);
+        toast.error("Google login failed. Please try again.");
+    };
+
+    const loginWithGoogle = useGoogleLogin({
+        flow: 'auth-code',
+        onSuccess: handleGoogleSuccess,
+        onError: handleGoogleError,
+    });
+    
     // Load data from localStorage on component mount
     useEffect(() => {
         const storedData = localStorage.getItem('tempUserData');
@@ -25,8 +54,8 @@ const CreateAccount = () => {
             setPassword(userData.password || '');
         }
     }, []);
-
-    const validateForm = () => {
+    
+        const validateForm = () => {
         const newErrors = {};
         if (!firstName.trim()) newErrors.firstName = 'First Name is required.';
         if (!lastName.trim()) newErrors.lastName = 'Last Name is required.';
@@ -53,18 +82,18 @@ const CreateAccount = () => {
     };
 
     const handleNext = (e) => {
-        e.preventDefault();
-        if (validateForm()) {
-            const userData = { firstName, lastName, email, password };
-            localStorage.setItem('tempUserData', JSON.stringify(userData));
-            navigate('/business-setup');
+     e.preventDefault(); 
+     if (validateForm()) { 
+        const userData = { firstName, lastName, email, password };
+         localStorage.setItem('tempUserData', JSON.stringify(userData)); 
+         navigate('/business-setup'); 
         }
     };
 
     const isPasswordValid = !errors.password && password.length > 0 &&
-                            /\d/.test(password) &&
-                            /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(password) &&
-                            password.length >= 8;
+                                  /\d/.test(password) &&
+                                  /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(password) && 
+                                  password.length >= 8;
 
     return (
         <>
@@ -76,74 +105,77 @@ const CreateAccount = () => {
                         <p className="mt-2 text-sm text-gray-600">Create an account to continue.</p>
                     </div>
 
-                    <div className="space-y-6">
-                        <button className="w-full flex items-center justify-center py-3 px-4 bg-gray-100 hover:bg-gray-200 rounded-lg transition">
-                            <svg className="w-6 h-6 mr-3" viewBox="0 0 24 24"><path fill="#4285F4" d="M21.35,11.1H12.18V13.83H18.69C18.36,17.64 15.19,19.27 12.19,19.27C8.36,19.27 5,16.25 5,12.5C5,8.75 8.36,5.73 12.19,5.73C14.03,5.73 15.6,6.33 16.84,7.35L19.09,5.12C17.02,3.37 14.82,2.5 12.19,2.5C7.03,2.5 3,6.58 3,11.5C3,16.42 7.03,20.5 12.19,20.5C17.83,20.5 21.6,16.66 21.6,11.73C21.6,11.43 21.35,11.1 21.35,11.1Z"/></svg>
-                            <span className="font-semibold text-gray-700">Continue with Google</span>
-                        </button>
-                        <div className="flex items-center">
-                            <hr className="w-full border-gray-300" /><span className="px-4 text-sm font-medium text-gray-500">OR</span><hr className="w-full border-gray-300" />
-                        </div>
-                        <form onSubmit={handleNext} className="space-y-6">
-                            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div className="space-y-6">
+                    <button 
+                        onClick={() => loginWithGoogle()}
+                        disabled={loading}
+                        className="w-full flex items-center justify-center py-3 px-4 bg-gray-100 hover:bg-gray-200 rounded-lg transition disabled:opacity-50"
+                    >
+                        <img src={google} alt="Google Logo" className="w-5 h-5 mr-3" />
+                        <span className="font-semibold text-gray-700">{loading ? 'Processing...' : 'Continue with Google'}</span>
+                    </button>
+                    <div className="flex items-center">
+                        <hr className="w-full border-gray-300" /><span className="px-4 text-sm font-medium text-gray-500">OR</span><hr className="w-full border-gray-300" />
+                    </div>
+                                <form onSubmit={handleNext} className="space-y-6">
+                                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">                                       <InputField
+                                        id="firstName"
+                                        label="First Name"
+                                        placeholder="Dominic"
+                                        value={firstName}
+                                        onChange={(e) => setFirstName(e.target.value)}
+                                        hasError={!!errors.firstName}
+                                        isValid={!errors.firstName && firstName.trim().length > 0}
+                                    />
+                                    <InputField
+                                        id="lastName"
+                                        label="Last Name"
+                                        placeholder="Praise"
+                                        value={lastName}
+                                        onChange={(e) => setLastName(e.target.value)}
+                                        hasError={!!errors.lastName}
+                                        isValid={!errors.lastName && lastName.trim().length > 0}
+                                    />
+                                </div>
                                 <InputField
-                                    id="firstName"
-                                    label="First Name"
-                                    placeholder="Dominic"
-                                    value={firstName}
-                                    onChange={(e) => setFirstName(e.target.value)}
-                                    hasError={!!errors.firstName}
-                                    isValid={!errors.firstName && firstName.trim().length > 0}
+                                    id="email"
+                                    label="Email Address"
+                                    type="email"
+                                    placeholder="dom@gmail.com"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    hasError={!!errors.email}
+                                    isValid={!errors.email && email.trim().length > 0 && /\S+@\S+\.\S+/.test(email)}
                                 />
                                 <InputField
-                                    id="lastName"
-                                    label="Last Name"
-                                    placeholder="Praise"
-                                    value={lastName}
-                                    onChange={(e) => setLastName(e.target.value)}
-                                    hasError={!!errors.lastName}
-                                    isValid={!errors.lastName && lastName.trim().length > 0}
+                                    id="password"
+                                    label="Password"
+                                    type="password"
+                                    placeholder="••••••••"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    hasError={!!errors.password}
+                                    isValid={isPasswordValid}
                                 />
-                            </div>
-                            <InputField
-                                id="email"
-                                label="Email Address"
-                                type="email"
-                                placeholder="dom@gmail.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                hasError={!!errors.email}
-                                isValid={!errors.email && email.trim().length > 0 && /\S+@\S+\.\S+/.test(email)}
-                            />
-                            <InputField
-                                id="password"
-                                label="Password"
-                                type="password"
-                                placeholder="••••••••"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                hasError={!!errors.password}
-                                isValid={isPasswordValid}
-                            />
-                            
-                            <PasswordCriteria password={password} />
-                            
-                            <button type="submit" className="w-full py-3 font-semibold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
-                                Next
-                            </button>
-                        </form>
-                    </div>
-
-                    <div className="text-center">
-                        <p className="text-sm text-gray-600">
-                            Already have an account?{' '}
-                            <a href="/signin" className="font-semibold text-blue-600 hover:underline">Sign In</a>
-                        </p>
-                    </div>
+                                
+                                <PasswordCriteria password={password} />
+                                
+                                <button type="submit" className="w-full py-3 font-semibold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+                                    Next
+                                </button>
+                            </form>
                 </div>
+
+                <div className="text-center">
+                    <p className="text-sm text-gray-600">
+                        Already have an account?{' '}
+                        <a href="/signin" className="font-semibold text-blue-600 hover:underline">Sign In</a></p>
+                </div>
+               </div>
             </div>
-        </>
+            </>
     );
 };
 
 export default CreateAccount;
+

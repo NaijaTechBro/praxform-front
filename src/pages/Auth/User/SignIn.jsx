@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useGoogleLogin } from '@react-oauth/google';
+import { toast } from 'react-toastify';
+
 import InputField from '../../../components/Auth/InputField';
 import Header from '../../../components/Auth/Header';
+import google from '../../../assets/google.svg';
 
-const SignIn = ({ setPage}) => {
+const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [localError, setLocalError] = useState('');
@@ -23,12 +27,21 @@ const SignIn = ({ setPage}) => {
     const result = await login({ email, password });
     
     if (result.success) {
-      
-      navigate('/dashboard'); 
+      if (result.mfaRequired) {
+        // Navigate to the MFA page, passing the email along
+        navigate('/login-code', { state: { email } });
+      } else {
+        toast.success("Successfully signed in!");
+        navigate('/dashboard'); 
+      }
     } else {
-      setLocalError(result.message || error);
+      setLocalError(result.message || error || 'An unknown error occurred.');
     }
   };
+
+  const loginWithGoogle = useGoogleLogin({
+    flow: 'auth-code',
+  });
 
   return (
     <>
@@ -45,10 +58,12 @@ const SignIn = ({ setPage}) => {
           </div>
           
          <div className="space-y-6">
-             <button className="w-full flex items-center justify-center py-3 px-4 bg-gray-100 hover:bg-gray-200 rounded-lg transition">
-                 <svg className="w-6 h-6 mr-3" viewBox="0 0 24 24">
-                     <path fill="#4285F4" d="M21.35,11.1H12.18V13.83H18.69C18.36,17.64 15.19,19.27 12.19,19.27C8.36,19.27 5,16.25 5,12.5C5,8.75 8.36,5.73 12.19,5.73C14.03,5.73 15.6,6.33 16.84,7.35L19.09,5.12C17.02,3.37 14.82,2.5 12.19,2.5C7.03,2.5 3,6.58 3,11.5C3,16.42 7.03,20.5 12.19,20.5C17.83,20.5 21.6,16.66 21.6,11.73C21.6,11.43 21.35,11.1 21.35,11.1Z"/>
-                 </svg>
+             <button
+                onClick={() => loginWithGoogle()}
+                className="w-full flex items-center justify-center py-3 px-4 bg-gray-100 hover:bg-gray-200 rounded-lg transition"
+                disabled={loading}
+             >
+                 <img src={google} alt="Google Logo" className="w-5 h-5 mr-3" />
                  <span className="font-semibold text-gray-700">Continue with Google</span>
              </button>
 
@@ -58,7 +73,7 @@ const SignIn = ({ setPage}) => {
                  <hr className="w-full border-gray-300" />
              </div>
             
-            <form onSubmit={handleSignIn}>
+            <form onSubmit={handleSignIn} className="space-y-4">
               <InputField 
                 id="email" 
                 label="Email Address" 
@@ -99,7 +114,7 @@ const SignIn = ({ setPage}) => {
                 {loading ? 'Signing In...' : 'Sign In'}
               </button>
             </form>
-          </div>
+         </div>
           
           <div className="text-center">
             <p className="text-sm text-gray-600">
@@ -116,3 +131,4 @@ const SignIn = ({ setPage}) => {
 };
 
 export default SignIn;
+
