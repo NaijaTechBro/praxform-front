@@ -5,6 +5,20 @@ import { toast } from 'react-toastify';
 import InputField from '../../../components/Auth/InputField';
 import Header from '../../../components/Auth/Header';
 
+// --- Helper function to mask the email address ---
+const maskEmail = (email) => {
+    if (!email || email.indexOf('@') === -1) {
+        return "your email"; // Fallback for invalid or missing email
+    }
+    const [localPart, domain] = email.split('@');
+    if (localPart.length <= 2) {
+        return `${localPart[0]}*@${domain}`;
+    }
+    const maskedLocalPart = localPart.substring(0, 2) + '****';
+    return `${maskedLocalPart}@${domain}`;
+};
+
+
 const LoginCode = () => {
     const [code, setCode] = useState('');
     const [localError, setLocalError] = useState('');
@@ -14,7 +28,6 @@ const LoginCode = () => {
     const location = useLocation();
     const email = location.state?.email;
 
-    // Redirect if email is not available in state (e.g., direct navigation)
     useEffect(() => {
         if (!email) {
             toast.error("An error occurred. Please try signing in again.");
@@ -30,7 +43,6 @@ const LoginCode = () => {
             return;
         }
         
-        // Correctly call verifyMfa with separate arguments
         const result = await verifyMfa(email, code);
         
         if (result.success) {
@@ -49,7 +61,8 @@ const LoginCode = () => {
                     <div className="text-center">
                         <h1 className="text-3xl font-bold text-gray-900">Check Your Email</h1>
                         <p className="mt-2 text-sm text-gray-600">
-                            We've sent a 6-digit login code to <strong>{email || "your email"}</strong>.
+                            {/* --- FIX: Use the maskEmail function here --- */}
+                            We've sent a 6-digit login code to <strong>{maskEmail(email)}</strong>.
                         </p>
                     </div>
                     
@@ -79,7 +92,7 @@ const LoginCode = () => {
 
                     <div className="text-center">
                          <button onClick={() => navigate('/signin')} className="font-semibold text-sm text-blue-600 hover:underline">
-                             &larr; Back to Sign In
+                              &larr; Back to Sign In
                          </button>
                     </div>
                 </div>

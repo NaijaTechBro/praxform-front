@@ -123,7 +123,7 @@ const handleGoogleSuccess = async (codeResponse) => {
                                     <InputField
                                         id="firstName"
                                         label="First Name"
-                                        placeholder="Dominic"
+                                        placeholder="John"
                                         value={firstName}
                                         onChange={(e) => setFirstName(e.target.value)}
                                         hasError={!!errors.firstName}
@@ -132,7 +132,7 @@ const handleGoogleSuccess = async (codeResponse) => {
                                     <InputField
                                         id="lastName"
                                         label="Last Name"
-                                        placeholder="Praise"
+                                        placeholder="Doe"
                                         value={lastName}
                                         onChange={(e) => setLastName(e.target.value)}
                                         hasError={!!errors.lastName}
@@ -143,7 +143,7 @@ const handleGoogleSuccess = async (codeResponse) => {
                                     id="email"
                                     label="Email Address"
                                     type="email"
-                                    placeholder="dom@gmail.com"
+                                    placeholder="youremail@gmail.com"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     hasError={!!errors.email}
