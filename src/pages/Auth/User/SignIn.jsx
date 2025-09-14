@@ -13,11 +13,9 @@ const SignIn = () => {
     const [password, setPassword] = useState('');
     const [localError, setLocalError] = useState('');
     
-    // Destructure all necessary functions from the AuthContext
     const { login, googleAuth, loading, error } = useAuth();
     const navigate = useNavigate();
 
-    // Handler for standard email/password login
     const handleSignIn = async (e) => {
         e.preventDefault();
         setLocalError('');
@@ -29,38 +27,29 @@ const SignIn = () => {
         const result = await login({ email, password });
         
         if (result.success && result.mfaRequired) {
-            // On success, navigate to the MFA page
             navigate('/login-code', { state: { email } });
         } else if (!result.success) {
             setLocalError(result.message || error || 'An unknown error occurred.');
         }
     };
 
-    // Handler for successful Google authentication
+    // REVERTED: Simplified Google success handler
     const handleGoogleSuccess = async (codeResponse) => {
         const result = await googleAuth(codeResponse.code);
         
         if (result.success) {
-            if (result.mfaRequired) {
-                // For an EXISTING user, navigate to the MFA page
-                navigate('/login-code', { state: { email: result.email } });
-            } else {
-                // For a NEW user, login is direct, so navigate to the dashboard
-                toast.success("Welcome! Your account has been created.");
-                navigate('/dashboard');
-            }
+            toast.success("Successfully signed in with Google!");
+            navigate('/dashboard');
         } else {
             setLocalError(result.message || "Google authentication failed.");
         }
     };
 
-    // Handler for failed Google authentication
     const handleGoogleError = (error) => {
         console.error("Google Login Failed:", error);
         toast.error("Google login failed. Please try again.");
     };
 
-    // Initialize the Google Login hook
     const loginWithGoogle = useGoogleLogin({
         flow: 'auth-code',
         onSuccess: handleGoogleSuccess,
@@ -68,6 +57,7 @@ const SignIn = () => {
     });
 
     return (
+        // ... your JSX is unchanged ...
         <>
             <Header />
             <div className="flex items-center justify-center min-h-screen bg-gray-100">
